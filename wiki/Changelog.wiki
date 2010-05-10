@@ -1,4 +1,4 @@
-#summary Contains all bug fixes.
+#summary Contains program changes.
 #labels Phase-Design
 = Blitz Change Log=
 
