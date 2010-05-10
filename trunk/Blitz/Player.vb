@@ -227,11 +227,11 @@ Namespace Objects
         ''' <summary>
         ''' Returns the flag status a card in the player's hand.
         ''' </summary>
-        ''' <param name="bytCard"></param>
+        ''' <param name="Card"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetFlag(ByVal bytCard As Byte) As Boolean
-            Return _hand(bytCard).Flag
+        Public Function GetFlag(ByVal Card As Byte) As Boolean
+            Return _hand(Card).Flag
         End Function
 
         ''' <summary>
@@ -293,7 +293,7 @@ Namespace Objects
         Public Function AddCard(ByVal value As Byte) As Boolean
             If _totalCards = 4 Then Return False
 
-            With _hand(FreeCard)
+            With _hand(_freeCard)
                 .Position = value
                 .InUse = True
             End With
@@ -359,7 +359,7 @@ Namespace Objects
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function FreeCard() As Byte
+        Private Function _freeCard() As Byte
             For i As Byte = 0 To UBound(_hand)
                 If Not _hand(i).InUse Then Return i
             Next
