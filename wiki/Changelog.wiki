@@ -1,0 +1,7 @@
+#summary Contains all bug fixes.
+#labels Phase-Design
+= Blitz Change Log=
+
+== Version 1.0.1 ==
+*Bug Fixes*
+   * Fixed issue with starting a new game while a computer is taking their turn.
