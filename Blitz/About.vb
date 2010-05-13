@@ -16,15 +16,18 @@
 Option Explicit On
 
 Public Class About
+
+#Region "Form Handlers"
     Private Sub About_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        Dim VersionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
+        Dim versionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
 
         lblAppName.Text = Application.ProductName
         lblAppAuthor.Text = "by Ryan Skeldon"
-        lblAppVersion.Text = "Version " & VersionInfo.ProductVersion
+        lblAppVersion.Text = "Version " & versionInfo.ProductVersion
     End Sub
 
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         Me.Close()
     End Sub
+#End Region
 End Class
