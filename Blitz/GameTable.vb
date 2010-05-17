@@ -273,7 +273,6 @@ Public Class GameTable
             If GetScore(CurrentPlayer) > bytGoal Then
                 Knocker = CurrentPlayer
                 KnockActive = True
-                SetStatus(Player(CurrentPlayer).Name & " has knocked!")
             End If
         End If
 
@@ -540,6 +539,10 @@ Public Class GameTable
     End Sub
 
     Private Sub DoTurnOver()
+        If KnockActive And Knocker = CurrentPlayer Then
+            SetStatus(Player(CurrentPlayer).Name & " has knocked!")
+        End If
+
         ' Check if player has a blitz
         If HasBlitz(CurrentPlayer) And RoundActive And Not KnockActive Then
             BlitzActive = True
