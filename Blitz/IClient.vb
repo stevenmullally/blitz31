@@ -20,17 +20,42 @@ Imports System.ComponentModel
 
 Namespace Networking
     Public Class IClient
-
-        Public Sub New(ByVal Sender As ISynchronizeInvoke, ByVal BufferSize As Integer)
-            ReDim _recvBuffer(BufferSize - 1)
-            _syncObj = Sender
+        ''' <summary>
+        ''' Initializes a client connection.
+        ''' </summary>
+        ''' <param name="sender">Sending form object.</param>
+        ''' <param name="bufferSize">Buffersize for socket connection.</param>
+        ''' <remarks></remarks>
+        Public Sub New(ByVal sender As ISynchronizeInvoke, ByVal bufferSize As Integer)
+            ReDim _recvBuffer(bufferSize - 1)
+            _syncObj = sender
         End Sub
 
 #Region "Properties"
+        ''' <summary>
+        ''' Synchronizing objects used for invoking callbacks.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private _syncObj As ISynchronizeInvoke
+
+        ''' <summary>
+        ''' A socket connection.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private _clientSocket As Socket
+
+        ''' <summary>
+        ''' Receive buffer.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private _recvBuffer() As Byte
 
+        ''' <summary>
+        ''' Gets the connection status of the socket.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>True if client is connected, otherwise false.</returns>
+        ''' <remarks></remarks>
         Public ReadOnly Property IsConnected() As Boolean
             Get
                 Dim SocketConnected As Boolean
@@ -43,29 +68,65 @@ Namespace Networking
             End Get
         End Property
 
+        ''' <summary>
+        ''' Generic callback with no parameters.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Delegate Sub SimpleCallback()
+
+        ''' <summary>
+        ''' Generic callback with a single string parameter.
+        ''' </summary>
+        ''' <param name="data"></param>
+        ''' <remarks></remarks>
         Private Delegate Sub ComplexCallback(ByVal data As String)
 #End Region
 
 #Region "Events"
+        ''' <summary>
+        ''' Raised when a socket is connected.
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Event OnSocketConnected()
+
+        ''' <summary>
+        ''' Raised when a socket is disconnected.
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Event OnSocketDisconnected()
+
+        ''' <summary>
+        ''' Raised when data is received.
+        ''' </summary>
+        ''' <param name="data"></param>
+        ''' <remarks></remarks>
         Public Event OnDataReceived(ByVal data As String)
 #End Region
 
 #Region "Public Methods"
-        Public Function OpenConnection(ByVal ServerAddress As String, ByVal ServerPort As Integer)
+        ''' <summary>
+        ''' Opens a socket connection to the given server address and port.
+        ''' </summary>
+        ''' <param name="serverAddress"></param>
+        ''' <param name="serverPort"></param>
+        ''' <returns>True if connection was successful, otherwise false.</returns>
+        ''' <remarks></remarks>
+        Public Function OpenConnection(ByVal serverAddress As String, ByVal serverPort As Integer)
             Try
                 CloseConnection()
 
                 _clientSocket = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
-                _clientSocket.BeginConnect(ServerAddress, ServerPort, AddressOf _doConnection, Nothing)
+                _clientSocket.BeginConnect(serverAddress, serverPort, AddressOf _doConnection, Nothing)
                 Return True
             Catch ex As Exception
                 Return False
             End Try
         End Function
 
+        ''' <summary>
+        ''' Closes the socket connection.
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Sub CloseConnection()
             Try
                 If IsConnected Then
@@ -79,6 +140,11 @@ Namespace Networking
 #End Region
 
 #Region "Private Methods"
+        ''' <summary>
+        ''' Connection asyncresult.
+        ''' </summary>
+        ''' <param name="ar"></param>
+        ''' <remarks></remarks>
         Private Sub _doConnection(ByVal ar As IAsyncResult)
             Try
                 _clientSocket.EndConnect(ar)
@@ -90,6 +156,11 @@ Namespace Networking
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Receive data asyncresult.
+        ''' </summary>
+        ''' <param name="ar"></param>
+        ''' <remarks></remarks>
         Private Sub _doReceiveData(ByVal ar As IAsyncResult)
             Dim numBytes As Integer
 
@@ -114,24 +185,45 @@ Namespace Networking
             _clientSocket.BeginReceive(_recvBuffer, 0, _recvBuffer.Length, SocketFlags.None, AddressOf _doReceiveData, Nothing)
         End Sub
 
+        ''' <summary>
+        ''' SocketConnected delegate.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub _callSocketConnected()
             Dim cb As New SimpleCallback(AddressOf _socketConnected)
             _syncObj.Invoke(cb, Nothing)
         End Sub
 
+        ''' <summary>
+        ''' Actual socketConnected event caller.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub _socketConnected()
             RaiseEvent OnSocketConnected()
         End Sub
 
+        ''' <summary>
+        ''' SocketDisconnected delegate.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub _callSocketDisconnected()
             Dim cb As New SimpleCallback(AddressOf _socketDisconnected)
             _syncObj.Invoke(cb, Nothing)
         End Sub
 
+        ''' <summary>
+        ''' Actual socketDisconnected event caller.
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub _socketDisconnected()
             RaiseEvent OnSocketDisconnected()
         End Sub
 
+        ''' <summary>
+        ''' DataReceived delegate.
+        ''' </summary>
+        ''' <param name="data"></param>
+        ''' <remarks></remarks>
         Private Sub _callDataReceived(ByVal data As String)
             Dim cb As New ComplexCallback(AddressOf _dataReceived)
             Dim args() As Object = {data}
@@ -139,6 +231,11 @@ Namespace Networking
             _syncObj.Invoke(cb, args)
         End Sub
 
+        ''' <summary>
+        ''' Actual dataReceived event caller.
+        ''' </summary>
+        ''' <param name="data"></param>
+        ''' <remarks></remarks>
         Private Sub _dataReceived(ByVal data As String)
             RaiseEvent OnDataReceived(data)
         End Sub
