@@ -36,7 +36,7 @@ Public Class GameTable
 
 #Region "Variable Declarations"
     Private Deck(51) As Card
-    Private Player(5) As Player
+    Private _player(5) As Player
     Private Seed As Integer = 0
     Private CurrentPlayer As Byte = 0
     Private Knocker As Byte = 0
@@ -60,36 +60,10 @@ Public Class GameTable
     Private Const CardFront As Byte = 0
     Private Const CardBack As Byte = 1
     Private Const CardInverted As Byte = 2
-
-#Region "Threading Memembers"
     Private ComputerThread As Thread
     Private SyncObj As New Object
     Private TakingTurn As Boolean
-
     Private Delegate Sub SimpleCallback()
-
-    Private Sub DoRefreshScreen()
-        Me.Refresh()
-    End Sub
-
-    Private Sub RefreshScreen()
-        Dim cb As New SimpleCallback(AddressOf DoRefreshScreen)
-        Try
-            Me.Invoke(cb)
-        Catch ex As Exception
-            MsgBox(ex.Message)
-        End Try
-    End Sub
-
-    Private Sub TurnOver()
-        Dim cb As New SimpleCallback(AddressOf DoTurnOver)
-        Try
-            Me.Invoke(cb)
-        Catch ex As Exception
-            MsgBox(ex.Message)
-        End Try
-    End Sub
-#End Region
 
     Private Enum CardOwners
         Deck = 0
@@ -200,7 +174,7 @@ Public Class GameTable
             RoundOver()
         Else
             ' Continue if Player is still in the game otherwise skip their turn
-            If Player(CurrentPlayer).InGame Then
+            If _player(CurrentPlayer).InGame Then
                 ' End the round if the current Player is the one who knocked
                 If KnockActive And CurrentPlayer = Knocker Then
                     RoundOver()
@@ -210,11 +184,11 @@ Public Class GameTable
                         Case 1
                             SetStatus("Your turn!", 1, True)
                         Case 2, 3, 4
-                            SetStatus(Player(CurrentPlayer).Name & "'s turn", CurrentPlayer, True)
+                            SetStatus(_player(CurrentPlayer).Name & "'s turn", CurrentPlayer, True)
                     End Select
 
                     ' Call ComputerTurn if Player is a computer
-                    Select Case Player(CurrentPlayer).Mode
+                    Select Case _player(CurrentPlayer).Mode
                         Case Modes.Computer
                             ' Disable user buttons
                             PlayerControls(False, True, False, True)
@@ -242,8 +216,8 @@ Public Class GameTable
     End Sub
 
     Private Sub ComputerTurn()
-        Dim bytMasterSuit As Byte
-        Dim bytSuits(3) As Byte
+        Dim masterSuit As Byte
+        Dim suits(3) As Byte
         Dim highestCard As Byte
         Dim lowestCard As Byte
         Dim i As Byte
@@ -262,44 +236,46 @@ Public Class GameTable
 
         ' Determine if computer should knock
         If Not KnockActive Then
-            Dim bytGoal As Byte
+            Dim goal As Byte
 
             If CardsLeft() >= 20 Then
-                bytGoal = 26
+                goal = 26
             ElseIf CardsLeft() <= 19 Then
-                bytGoal = 28
+                goal = 28
             End If
 
-            If GetScore(CurrentPlayer) > bytGoal Then
+            If GetScore(CurrentPlayer) > goal Then
                 Knocker = CurrentPlayer
                 KnockActive = True
             End If
         End If
 
+        ' Take turn if no one has knocked, or someone has and it wasn't the current player
         If Not KnockActive Or (KnockActive And Knocker <> CurrentPlayer) Then
-            With Player(CurrentPlayer)
-                bytMasterSuit = GetMasterSuit(CurrentPlayer)
+            With _player(CurrentPlayer)
+                masterSuit = GetMasterSuit(CurrentPlayer)
 
+                ' Get count of each suit in hand
                 For i = 0 To 2
-                    bytSuits(.GetCardSuit(i)) += 1
+                    suits(.GetCardSuit(i)) += 1
                 Next i
-
-                Thread.Sleep(1000)
 
                 sumA = 0 : sumB = 0
                 For i = 0 To 2
-                    If .GetCardSuit(i) = bytMasterSuit Then
+                    If .GetCardSuit(i) = masterSuit Then
                         .SetFlag(i, True)
                     Else
                         .SetFlag(i, False)
                     End If
                 Next i
 
+                Thread.Sleep(1000)
+
                 ' Look for a card to draw
-                If Deck(DiscardTop).SuitVal = bytMasterSuit Then
+                If Deck(DiscardTop).SuitVal = masterSuit Then
                     sumA += Deck(DiscardTop).Value
 
-                    Select Case bytSuits(bytMasterSuit)
+                    Select Case suits(masterSuit)
                         Case 1
                             For i = 0 To 2
                                 If .GetFlag(i) = True Then
@@ -348,7 +324,7 @@ Public Class GameTable
                             End If
                     End Select
                 Else
-                    Select Case bytSuits(bytMasterSuit)
+                    Select Case suits(masterSuit)
                         Case 1
                             highestCard = 0
                             For i = 0 To 2
@@ -421,27 +397,27 @@ Public Class GameTable
                 sumA = 0 : sumB = 0
 
                 For i = 0 To 3
-                    bytSuits(i) = 0
+                    suits(i) = 0
                     .SetFlag(i, False)
                 Next i
 
                 For i = 0 To 3
-                    bytSuits(.GetCardSuit(i)) += 1
+                    suits(.GetCardSuit(i)) += 1
                 Next i
 
-                bytMasterSuit = 0
+                masterSuit = 0
                 For i = 0 To 3
-                    If bytSuits(i) > bytSuits(bytMasterSuit) Then bytMasterSuit = i
+                    If suits(i) > suits(masterSuit) Then masterSuit = i
                 Next i
 
                 For i = 0 To 3
-                    If .GetCardSuit(i) = bytMasterSuit Then
+                    If .GetCardSuit(i) = masterSuit Then
                         sumA += .GetCardVal(i)
                         .SetFlag(i, True)
                     End If
                 Next i
 
-                Select Case bytSuits(bytMasterSuit)
+                Select Case suits(masterSuit)
                     Case 1
                         lowestCard = 0
                         For i = 0 To 3
@@ -535,12 +511,23 @@ Public Class GameTable
         SyncLock SyncObj
             TakingTurn = True
         End SyncLock
+
         TurnOver()
+    End Sub
+
+    Private Sub TurnOver()
+        Dim cb As New SimpleCallback(AddressOf DoTurnOver)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
     End Sub
 
     Private Sub DoTurnOver()
         If KnockActive And Knocker = CurrentPlayer Then
-            SetStatus(Player(CurrentPlayer).Name & " has knocked!")
+            SetStatus(_player(CurrentPlayer).Name & " has knocked!")
         End If
 
         ' Check if player has a blitz
@@ -574,10 +561,10 @@ Public Class GameTable
         Dim activePlayers As Byte = 0
 
         For i As Byte = 1 To 4
-            If Player(i).InGame Then activePlayers += 1
+            If _player(i).InGame Then activePlayers += 1
         Next
 
-        If activePlayers = 1 Or Not Player(1).InGame Then
+        If activePlayers = 1 Or Not _player(1).InGame Then
             GameOver()
         Else
             btnNewRound.Visible = True
@@ -589,14 +576,14 @@ Public Class GameTable
         Do
             Dealer += 1
             If Dealer > 4 Then Dealer = 1
-        Loop Until Player(Dealer).InGame
+        Loop Until _player(Dealer).InGame
 
         ' Set current player to player clock-wise of dealer
         CurrentPlayer = Dealer
         Do
             CurrentPlayer += 1
             If CurrentPlayer > 4 Then CurrentPlayer = 1
-        Loop Until Player(CurrentPlayer).InGame
+        Loop Until _player(CurrentPlayer).InGame
 
         Me.Refresh()
     End Sub
@@ -611,22 +598,22 @@ Public Class GameTable
 
             ' Find the lowest score of the round
             For i = 1 To 4
-                Player(i).Flag = False
-                If Player(i).InGame And GetScore(i) < LowestScore Then LowestScore = GetScore(i)
+                _player(i).Flag = False
+                If _player(i).InGame And GetScore(i) < LowestScore Then LowestScore = GetScore(i)
             Next
 
             ' Find the players who score matched the lowest score
             For i = 1 To 4
-                If Player(i).InGame And GetScore(i) = LowestScore Then Player(i).Flag = True
+                If _player(i).InGame And GetScore(i) = LowestScore Then _player(i).Flag = True
             Next
         Else
             ' Flag players who didn't have Blitz
             For i = 1 To 4
-                If Player(i).InGame Then
+                If _player(i).InGame Then
                     If GetScore(i) = 31 Then
-                        Player(i).Flag = False
+                        _player(i).Flag = False
                     Else
-                        Player(i).Flag = True
+                        _player(i).Flag = True
                     End If
                 End If
             Next
@@ -640,13 +627,13 @@ Public Class GameTable
 
         For i = 1 To 4
             ' Remove 1 token for any flagged player
-            If Player(i).Flag And Player(i).InGame Then
-                Player(i).RemoveToken(1)
-                SetStatus(Player(i).Name & " lost!", i)
+            If _player(i).Flag And _player(i).InGame Then
+                _player(i).RemoveToken(1)
+                SetStatus(_player(i).Name & " lost!", i)
             End If
 
             ' Remove an additional token if the person who knocked had the lowest score
-            If Player(i).Flag And Knocker = i Then Player(i).RemoveToken(1)
+            If _player(i).Flag And Knocker = i Then _player(i).RemoveToken(1)
         Next
     End Sub
 
@@ -660,46 +647,46 @@ Public Class GameTable
 #Region "Intialization Methods"
     Private Sub CreatePlayers()
         ' Create new players
-        For i As Byte = 0 To UBound(Player)
-            Player(i) = New Player(Modes.Computer)
+        For i As Byte = 0 To UBound(_player)
+            _player(i) = New Player(Modes.Computer)
         Next i
 
         ' Set Player 1 to Human
-        Player(1).Mode = Modes.Human
+        _player(1).Mode = Modes.Human
 
         ' Set Player names
-        Player(1).Name = "Player 1"
-        Player(2).Name = "Player 2"
-        Player(3).Name = "Player 3"
-        Player(4).Name = "Player 4"
+        _player(1).Name = "Player 1"
+        _player(2).Name = "Player 2"
+        _player(3).Name = "Player 3"
+        _player(4).Name = "Player 4"
 
         ' Set objDeck and discard locations
-        Player(CardOwners.Deck).X = 290 - Card.CardWidth
-        Player(CardOwners.Deck).Y = 300 - (Card.CardHeight / 2)
-        Player(CardOwners.Discard).X = 310
-        Player(CardOwners.Discard).Y = 300 - (Card.CardHeight / 2)
+        _player(CardOwners.Deck).X = 290 - Card.CardWidth
+        _player(CardOwners.Deck).Y = 300 - (Card.CardHeight / 2)
+        _player(CardOwners.Discard).X = 310
+        _player(CardOwners.Discard).Y = 300 - (Card.CardHeight / 2)
 
         ' Set objPlayer locations
-        Player(1).MidX = 300
-        Player(1).MidY = 500
-        Player(2).MidX = 100
-        Player(2).MidY = 300
-        Player(3).MidX = 300
-        Player(3).MidY = 100
-        Player(4).MidX = 500
-        Player(4).MidY = 300
+        _player(1).MidX = 300
+        _player(1).MidY = 500
+        _player(2).MidX = 100
+        _player(2).MidY = 300
+        _player(3).MidX = 300
+        _player(3).MidY = 100
+        _player(4).MidX = 500
+        _player(4).MidY = 300
     End Sub
 
     Private Sub DealCards()
         Dim myPlayer As Byte = Dealer + 1
 
-        SetStatus(Player(Dealer).Name & " is dealing cards", 0, True)
+        SetStatus(_player(Dealer).Name & " is dealing cards", 0, True)
 
         ' Deal cards to each player
-        For bytCards As Byte = 1 To 12
+        For i As Byte = 1 To 12
             If myPlayer > 4 Then myPlayer = 1
 
-            If Player(myPlayer).InGame Then
+            If _player(myPlayer).InGame Then
                 MoveCard(CardOwners.Deck, myPlayer)
                 Me.Refresh()
 
@@ -707,7 +694,7 @@ Public Class GameTable
             End If
 
             myPlayer += 1
-        Next bytCards
+        Next
 
         ' Setup discard pile
         MoveCard(CardOwners.Deck, CardOwners.Discard)
@@ -740,8 +727,8 @@ Public Class GameTable
         Knocker = Nothing
         BlitzActive = False
 
-        For i As Byte = 0 To UBound(Player)
-            Player(i).ResetPlayer()
+        For i As Byte = 0 To UBound(_player)
+            _player(i).ResetPlayer()
         Next
     End Sub
 
@@ -756,29 +743,29 @@ Public Class GameTable
     Private Sub SetCardLocations()
         If Not GameActive Then Exit Sub
 
-        With Player(1)
+        With _player(1)
             .X = .MidX - (Card.CardWidth + (CardOffset_X * (.TotalCards - 1))) / 2
             .Y = .MidY - (Card.CardHeight / 2)
         End With
-        With Player(2)
+        With _player(2)
             .X = .MidX - (Card.CardWidth / 2)
             .Y = .MidY - (Card.CardHeight + CardOffset_Y * (.TotalCards - 1)) / 2
         End With
-        With Player(3)
+        With _player(3)
             .X = .MidX - ((Card.CardWidth + CardOffset_X * (.TotalCards - 1)) / 2)
             .Y = .MidY - (Card.CardHeight / 2)
         End With
-        With Player(4)
+        With _player(4)
             .X = .MidX - (Card.CardWidth / 2)
             .Y = .MidY - (Card.CardHeight + CardOffset_Y * (.TotalCards - 1)) / 2
         End With
     End Sub
 
     Private Sub SetLabelLocations()
-        lblPlayer1.Location = New Point(Player(1).MidX - 50, Player(1).MidY + (CardHeight / 2) + 5)
-        lblPlayer2.Location = New Point(Player(2).MidX - (CardWidth / 2) - 20, Player(2).MidY + CardHeight + 10)
-        lblPlayer3.Location = New Point(Player(3).MidX - 50, Player(3).MidY + (CardHeight / 2) + 5)
-        lblPlayer4.Location = New Point(Player(4).MidX - (CardWidth / 2) - 20, Player(4).MidY + CardHeight + 10)
+        lblPlayer1.Location = New Point(_player(1).MidX - 50, _player(1).MidY + (CardHeight / 2) + 5)
+        lblPlayer2.Location = New Point(_player(2).MidX - (CardWidth / 2) - 20, _player(2).MidY + CardHeight + 10)
+        lblPlayer3.Location = New Point(_player(3).MidX - 50, _player(3).MidY + (CardHeight / 2) + 5)
+        lblPlayer4.Location = New Point(_player(4).MidX - (CardWidth / 2) - 20, _player(4).MidY + CardHeight + 10)
     End Sub
 
     Private Sub PlayerControls(ByVal DrawCardEnabled As Boolean, _
@@ -818,18 +805,18 @@ Public Class GameTable
         End Select
     End Sub
 
-    Private Sub UpdateScores(ByVal ShowScoreBox As Boolean)
-        If ShowScoreBox Then
+    Private Sub UpdateScores(ByVal showScoreBox As Boolean)
+        If showScoreBox Then
             ScoreBox.Visible = True
-            lblScoreName1.Text = Player(1).Name
-            lblScoreName2.Text = Player(2).Name
-            lblScoreName3.Text = Player(3).Name
-            lblScoreName4.Text = Player(4).Name
+            lblScoreName1.Text = _player(1).Name
+            lblScoreName2.Text = _player(2).Name
+            lblScoreName3.Text = _player(3).Name
+            lblScoreName4.Text = _player(4).Name
 
-            Select Case Player(1).Tokens
+            Select Case _player(1).Tokens
                 Case Is > 0
                     lblScore1.ForeColor = Color.White
-                    lblScore1.Text = Player(1).Tokens & " tokens"
+                    lblScore1.Text = _player(1).Tokens & " tokens"
                 Case 0
                     lblScore1.ForeColor = Color.Yellow
                     lblScore1.Text = "On their honor"
@@ -837,10 +824,10 @@ Public Class GameTable
                     lblScore1.ForeColor = Color.Red
                     lblScore1.Text = "Out"
             End Select
-            Select Case Player(2).Tokens
+            Select Case _player(2).Tokens
                 Case Is > 0
                     lblScore2.ForeColor = Color.White
-                    lblScore2.Text = Player(2).Tokens & " tokens"
+                    lblScore2.Text = _player(2).Tokens & " tokens"
                 Case 0
                     lblScore2.ForeColor = Color.Yellow
                     lblScore2.Text = "On their honor"
@@ -848,10 +835,10 @@ Public Class GameTable
                     lblScore2.ForeColor = Color.Red
                     lblScore2.Text = "Out"
             End Select
-            Select Case Player(3).Tokens
+            Select Case _player(3).Tokens
                 Case Is > 0
                     lblScore3.ForeColor = Color.White
-                    lblScore3.Text = Player(3).Tokens & " tokens"
+                    lblScore3.Text = _player(3).Tokens & " tokens"
                 Case 0
                     lblScore3.ForeColor = Color.Yellow
                     lblScore3.Text = "On their honor"
@@ -859,10 +846,10 @@ Public Class GameTable
                     lblScore3.ForeColor = Color.Red
                     lblScore3.Text = "Out"
             End Select
-            Select Case Player(4).Tokens
+            Select Case _player(4).Tokens
                 Case Is > 0
                     lblScore4.ForeColor = Color.White
-                    lblScore4.Text = Player(4).Tokens & " tokens"
+                    lblScore4.Text = _player(4).Tokens & " tokens"
                 Case 0
                     lblScore4.ForeColor = Color.Yellow
                     lblScore4.Text = "On their honor"
@@ -901,31 +888,31 @@ Public Class GameTable
         Return NoCard
     End Function
 
-    Private Function MoveCard(ByVal bytFrom As Byte, ByVal bytTo As Byte, Optional ByVal bytCard As Byte = NoCard) As Boolean
-        Select Case bytFrom
+    Private Function MoveCard(ByVal fromPlayer As Byte, ByVal toPlayer As Byte, Optional ByVal cardToMove As Byte = NoCard) As Boolean
+        Select Case fromPlayer
             Case CardOwners.Deck
                 Dim CardFound As Boolean = False
                 Dim rnd As New Random(Seed)
 
                 Do While Not CardFound
-                    bytCard = rnd.Next(0, 52)
+                    cardToMove = rnd.Next(0, 52)
 
-                    If Deck(bytCard).Owner = CardOwners.Deck Then
-                        Deck(bytCard).Owner = bytTo
+                    If Deck(cardToMove).Owner = CardOwners.Deck Then
+                        Deck(cardToMove).Owner = toPlayer
 
-                        Select Case bytTo
+                        Select Case toPlayer
                             Case 1, 2, 3, 4
-                                Player(bytTo).AddCard(bytCard)
+                                _player(toPlayer).AddCard(cardToMove)
                             Case CardOwners.Discard
-                                DiscardTop = bytCard
+                                DiscardTop = cardToMove
                         End Select
                         CardFound = True
                     End If
                 Loop
             Case CardOwners.Discard
-                PickupCard = bytCard
-                Deck(bytCard).Owner = bytTo
-                Player(bytTo).AddCard(bytCard)
+                PickupCard = cardToMove
+                Deck(cardToMove).Owner = toPlayer
+                _player(toPlayer).AddCard(cardToMove)
 
                 DiscardTop = DiscardBottom
 
@@ -942,11 +929,11 @@ Public Class GameTable
                     Deck(DiscardBottom).Owner = CardOwners.Used
                 End If
 
-                DiscardTop = bytCard
-                Deck(bytCard).Owner = CardOwners.Discard
+                DiscardTop = cardToMove
+                Deck(cardToMove).Owner = CardOwners.Discard
                 DiscardCount += 1
 
-                Player(bytFrom).RemoveCard(bytCard)
+                _player(fromPlayer).RemoveCard(cardToMove)
                 ResetInverts()
         End Select
     End Function
@@ -961,7 +948,7 @@ Public Class GameTable
         Dim bytSumA As Byte
         Dim bytSumB As Byte
 
-        With Player(bytPlayer)
+        With _player(bytPlayer)
             ' Find out the count of each suit in the hand, reset the flag for each card
             For x = 0 To 2
                 bytSuits(.GetCardSuit(x)) += 1
@@ -1023,7 +1010,7 @@ Public Class GameTable
     Private Function GetScore(ByVal bytPlayer As Byte) As Byte
         Dim bytMasterSuit As Byte = GetMasterSuit(bytPlayer)
 
-        With Player(bytPlayer)
+        With _player(bytPlayer)
             .Score = Nothing
 
             For x As Byte = 0 To 2
@@ -1045,7 +1032,6 @@ Public Class GameTable
 
 #Region "GameTable Handlers"
     Private Sub GameTable_Closing() Handles Me.Closing
-
         SyncLock SyncObj
             If TakingTurn Then
                 Try
@@ -1056,10 +1042,6 @@ Public Class GameTable
             End If
         End SyncLock
 
-        ' Set game state to nothing
-        GameActive = False
-        RoundActive = False
-
         ' Deinitialize the cards library
         Deinitialize()
     End Sub
@@ -1067,7 +1049,7 @@ Public Class GameTable
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
         ' Exit method if current objPlayer isn't a human
         If Not GameActive Then Exit Sub
-        If Player(CurrentPlayer).Mode <> Modes.Human Then Exit Sub
+        If _player(CurrentPlayer).Mode <> Modes.Human Then Exit Sub
 
         ' If a game or round is not in play then ignore all clicks
         If Not GameActive Or Not RoundActive Then Return
@@ -1084,19 +1066,19 @@ Public Class GameTable
         For i As Byte = 0 To UBound(Deck)
             Deck(i).Status = CardFront
 
-            If Deck(i).Owner = 1 And Player(1).TotalCards = 4 Then
-                If (_x >= Player(1).X) And (_x <= Player(1).X + Card.CardWidth) And _
-                   (_y >= Player(1).Y) And (_y <= Player(1).Y + Card.CardHeight) Then
+            If Deck(i).Owner = 1 And _player(1).TotalCards = 4 Then
+                If (_x >= _player(1).X) And (_x <= _player(1).X + Card.CardWidth) And _
+                   (_y >= _player(1).Y) And (_y <= _player(1).Y + Card.CardHeight) Then
 
                     iCard = i
                     iSelectedCard = 1
                 End If
 
-                Player(1).X += CardOffset_X
+                _player(1).X += CardOffset_X
             ElseIf Deck(i).Owner = CardOwners.Discard Then
-                If (_x >= Player(CardOwners.Discard).X) And (_x <= Player(CardOwners.Discard).X + Card.CardWidth) And _
-                   (_y >= Player(CardOwners.Discard).Y) And (_y <= Player(CardOwners.Discard).Y + Card.CardHeight) And _
-                   Player(1).TotalCards < 4 Then
+                If (_x >= _player(CardOwners.Discard).X) And (_x <= _player(CardOwners.Discard).X + Card.CardWidth) And _
+                   (_y >= _player(CardOwners.Discard).Y) And (_y <= _player(CardOwners.Discard).Y + Card.CardHeight) And _
+                   _player(1).TotalCards < 4 Then
 
                     iCard = i
                     iSelectedCard = CardOwners.Discard
@@ -1114,7 +1096,7 @@ Public Class GameTable
                 PlayerControls(True, True, True, True, "Take Card")
             End If
         Else
-            If Player(1).TotalCards < 4 Then
+            If _player(1).TotalCards < 4 Then
                 If KnockActive Then
                     PlayerControls(True, True, False, True, "Can't Knock")
                 Else
@@ -1135,8 +1117,8 @@ Public Class GameTable
         If Not GameActive Then Exit Sub
 
         ' Draw O and X for Deck and Discard piles
-        PaintCard(e.Graphics, Player(CardOwners.Deck).X, Player(CardOwners.Deck).Y, NoCard_O, CardBack)
-        PaintCard(e.Graphics, Player(CardOwners.Discard).X, Player(CardOwners.Discard).Y, NoCard_X, CardBack)
+        PaintCard(e.Graphics, _player(CardOwners.Deck).X, _player(CardOwners.Deck).Y, NoCard_O, CardBack)
+        PaintCard(e.Graphics, _player(CardOwners.Discard).X, _player(CardOwners.Discard).Y, NoCard_X, CardBack)
 
         '// DEBUG SECTION //
         If DebugMode Then
@@ -1156,14 +1138,14 @@ Public Class GameTable
         For i As Byte = 0 To UBound(Deck)
             Select Case Deck(i).Owner
                 Case 1
-                    With Player(1)
+                    With _player(1)
                         If .InGame Then
                             PaintCard(e.Graphics, .X, .Y, i, Deck(i).Status)
                             .X += CardOffset_X
                         End If
                     End With
                 Case 2
-                    With Player(2)
+                    With _player(2)
                         If .InGame Then
                             If DebugMode Or RoundActive = False Then
                                 PaintCard(e.Graphics, .X, .Y, i, CardFront)
@@ -1174,7 +1156,7 @@ Public Class GameTable
                         End If
                     End With
                 Case 3
-                    With Player(3)
+                    With _player(3)
                         If .InGame Then
                             If DebugMode Or RoundActive = False Then
                                 PaintCard(e.Graphics, .X, .Y, i, CardFront)
@@ -1185,7 +1167,7 @@ Public Class GameTable
                         End If
                     End With
                 Case 4
-                    With Player(4)
+                    With _player(4)
                         If .InGame Then
                             If DebugMode Or RoundActive = False Then
                                 PaintCard(e.Graphics, .X, .Y, i, CardFront)
@@ -1215,7 +1197,7 @@ Public Class GameTable
             End Select
 
             For i = 0 To n
-                PaintCard(e.Graphics, Player(CardOwners.Deck).X - x, Player(CardOwners.Deck).Y - y, DeckPattern, CardBack)
+                PaintCard(e.Graphics, _player(CardOwners.Deck).X - x, _player(CardOwners.Deck).Y - y, DeckPattern, CardBack)
                 x += 2
                 y += 2
             Next
@@ -1236,12 +1218,26 @@ Public Class GameTable
             x = 0 : y = 0
             If DiscardCount > 1 Then
                 For i = 0 To n
-                    PaintCard(e.Graphics, Player(CardOwners.Discard).X - x, Player(CardOwners.Discard).Y - y, DiscardTop, CardFront)
+                    PaintCard(e.Graphics, _player(CardOwners.Discard).X - x, _player(CardOwners.Discard).Y - y, DiscardTop, CardFront)
                     x += 2 : y += 2
                 Next
             End If
-            PaintCard(e.Graphics, Player(CardOwners.Discard).X - x, Player(CardOwners.Discard).Y - y, DiscardTop, Deck(DiscardTop).Status)
+            PaintCard(e.Graphics, _player(CardOwners.Discard).X - x, _player(CardOwners.Discard).Y - y, DiscardTop, Deck(DiscardTop).Status)
         End If
+    End Sub
+
+    Private Sub DoRefreshScreen()
+        Me.Refresh()
+    End Sub
+
+    Private Sub RefreshScreen()
+        Dim cb As New SimpleCallback(AddressOf DoRefreshScreen)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
     End Sub
 #End Region
 
@@ -1254,7 +1250,7 @@ Public Class GameTable
         ResetInverts()
 
         ' Check if objPlayer didn't already draw a card
-        If Player(CurrentPlayer).TotalCards < 4 Then
+        If _player(CurrentPlayer).TotalCards < 4 Then
             MoveCard(CardOwners.Deck, CurrentPlayer)
             PlayerControls(False, True, False, True, "Select Card")
         End If
@@ -1269,10 +1265,10 @@ Public Class GameTable
             Case "Knock"
                 Knocker = CurrentPlayer
                 KnockActive = True
-                SetStatus(Player(CurrentPlayer).Name & " has knocked!", 0, True)
+                SetStatus(_player(CurrentPlayer).Name & " has knocked!", 0, True)
                 TurnOver()
             Case "Take Card"
-                If Player(CurrentPlayer).TotalCards < 4 Then
+                If _player(CurrentPlayer).TotalCards < 4 Then
                     MoveCard(CardOwners.Discard, CurrentPlayer, DiscardTop)
                     PlayerControls(False, True, False, True, "Select Card")
                     Me.Refresh()
