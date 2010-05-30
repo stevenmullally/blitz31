@@ -56,7 +56,7 @@ Public Class GameTable
     Private Const NoCard As Byte = 52
     Private Const NoCard_X As Byte = 67
     Private Const NoCard_O As Byte = 68
-    Private Const DeckPattern As Byte = 58
+    Private Const DeckPattern As Byte = 52
     Private Const CardFront As Byte = 0
     Private Const CardBack As Byte = 1
     Private Const CardInverted As Byte = 2
@@ -78,9 +78,6 @@ Public Class GameTable
 
 #Region "Main Game Methods"
     Private Sub NewGame()
-        ' Initialize cards library if needed
-        If Not Card.Initialize() Then Exit Sub
-
         ' Get a lock on SyncObj to check if a computer thread is running
         SyncLock SyncObj
             If TakingTurn Then
@@ -1041,9 +1038,6 @@ Public Class GameTable
                 End Try
             End If
         End SyncLock
-
-        ' Deinitialize the cards library
-        Deinitialize()
     End Sub
 
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
@@ -1115,10 +1109,6 @@ Public Class GameTable
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
         If Not GameActive Then Exit Sub
-
-        ' Draw O and X for Deck and Discard piles
-        PaintCard(e.Graphics, _player(CardOwners.Deck).X, _player(CardOwners.Deck).Y, NoCard_O, CardBack)
-        PaintCard(e.Graphics, _player(CardOwners.Discard).X, _player(CardOwners.Discard).Y, NoCard_X, CardBack)
 
         '// DEBUG SECTION //
         If DebugMode Then

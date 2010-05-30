@@ -37,6 +37,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: ".\Blitz\bin\Release\Blitz.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\BlitzCards.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Blitz"; Filename: "{app}\Blitz.exe"

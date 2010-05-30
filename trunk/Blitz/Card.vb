@@ -14,7 +14,7 @@
 '    along with this program; if not, write to the Free Software
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Option Explicit On
-Imports System.Drawing
+Imports BlitzCards.CardGraphics
 
 Namespace Objects
     Public Class Card
@@ -29,13 +29,8 @@ Namespace Objects
         End Sub
 
 #Region "Properties"
-        Private Declare Function cdtInit Lib "cards.dll" (ByRef width As Integer, ByRef height As Integer) As Boolean
-        Private Declare Function cdtDraw Lib "cards.dll" (ByVal hDC As IntPtr, ByVal x As Integer, ByVal y As Integer, ByVal Card As Integer, ByVal Type As Integer, ByVal clr As Integer) As Integer
-        Private Declare Sub cdtTerm Lib "cards.dll" ()
-
-        Private Shared LibraryInitialized As Boolean = False
-        Public Shared CardWidth As Integer = 0
-        Public Shared CardHeight As Integer = 0
+        Public Shared CardWidth As Integer = BlitzCards.CardWidth
+        Public Shared CardHeight As Integer = BlitzCards.CardHeight
 
         Private _flag As Boolean = False
         ''' <summary>
@@ -151,35 +146,6 @@ Namespace Objects
 
 #Region "Public Methods"
         ''' <summary>
-        ''' Initializes the cards.dll library.
-        ''' </summary>
-        ''' <returns>True if the library was successfully initialized.</returns>
-        ''' <remarks></remarks>
-        Public Shared Function Initialize() As Boolean
-            If LibraryInitialized Then Return True
-            Try
-                If cdtInit(CardWidth, CardHeight) Then
-                    LibraryInitialized = True
-                    Return True
-                End If
-            Catch ex As Exception
-                MsgBox(ex.Message, MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
-                Return False
-            End Try
-        End Function
-
-        ''' <summary>
-        ''' Deinitializes the cards.dll library.
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Shared Sub Deinitialize()
-            If LibraryInitialized Then
-                cdtTerm()
-                LibraryInitialized = False
-            End If
-        End Sub
-
-        ''' <summary>
         ''' Paints a card at the given X Y location.
         ''' </summary>
         ''' <param name="DrawingSurface"></param>
@@ -190,11 +156,7 @@ Namespace Objects
         ''' <remarks></remarks>
         Public Shared Sub PaintCard(ByVal DrawingSurface As Graphics, ByVal XLoc As Integer, ByVal YLoc As Integer, _
                                     ByVal Card As Byte, ByVal Type As Byte)
-            Dim hDC As IntPtr = DrawingSurface.GetHdc
-
-            cdtDraw(hDC, XLoc, YLoc, Card, Type, Color.White.ToArgb And 16777215)
-
-            DrawingSurface.ReleaseHdc()
+            DrawCard(DrawingSurface, XLoc, YLoc, Card, Type)
         End Sub
 
         ''' <summary>
