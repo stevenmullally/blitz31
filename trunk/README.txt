@@ -22,11 +22,6 @@
    * Operating System: Windows XP/2000/Vista/7 (32-bit ONLY)
    * Other: Microsoft .NET Framework 3.5 or Higher
 
-   Blitz makes use of the Cards.dll library included in Windows 98/XP/2000. 
-To play Blitz on other versions of Windows, you will need a copy of this 
-library inside your System32 folder. A quick search online will point you 
-to many sites that offer the file for download.
-
 -= Troubleshooting =-
 
    Problem:  Program fails to launch
@@ -34,9 +29,3 @@ to many sites that offer the file for download.
              even installed.
    Solution: Download and reinstall the .NET Framework from Microsoft's
              website.
-
-   Problem:  "Card Library Error" pops up when starting a new game.
-   Reason:   You are missing the cards.dll file in your system or
-             game folder.
-   Solution: Place the cards.dll file into your system or game folder.
-             (Not included in install for copyright reasons.)
