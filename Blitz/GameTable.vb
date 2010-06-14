@@ -506,7 +506,7 @@ Public Class GameTable
 
         ' End the computer's turn
         SyncLock SyncObj
-            TakingTurn = True
+            TakingTurn = False
         End SyncLock
 
         TurnOver()
