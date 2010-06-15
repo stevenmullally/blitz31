@@ -4,7 +4,7 @@
 
 == Version 1.1.0 ==
 *Features*
-   * Now uses custom card library. (No longer uses Microsoft's Cards.dll)
+   * Issue 16 Now uses custom card library. (No longer uses Microsoft's Cards.dll)
 
 == Version 1.0.1 ==
 *Bug Fixes*
