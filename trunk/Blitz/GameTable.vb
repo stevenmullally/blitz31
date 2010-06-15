@@ -78,6 +78,14 @@ Public Class GameTable
 
 #Region "Main Game Methods"
     Private Sub NewGame()
+        ' Initialize card library
+        Try
+            If Not Card.Initialize() Then Exit Sub
+        Catch ex As Exception
+            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            Exit Sub
+        End Try
+
         ' Get a lock on SyncObj to check if a computer thread is running
         SyncLock SyncObj
             If TakingTurn Then

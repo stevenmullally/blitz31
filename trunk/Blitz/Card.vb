@@ -29,8 +29,9 @@ Namespace Objects
         End Sub
 
 #Region "Properties"
-        Public Shared CardWidth As Integer = BlitzCards.CardWidth
-        Public Shared CardHeight As Integer = BlitzCards.CardHeight
+        Private Shared LibraryInitialized As Boolean
+        Public Shared CardWidth As Integer
+        Public Shared CardHeight As Integer
 
         Private _flag As Boolean = False
         ''' <summary>
@@ -146,6 +147,27 @@ Namespace Objects
 
 #Region "Public Methods"
         ''' <summary>
+        ''' Initializes card library.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Used to setup card dimension information.</remarks>
+        Public Shared Function Initialize() As Boolean
+            If LibraryInitialized Then Return True
+
+            Try
+                If BlitzCards.InitCards Then
+                    LibraryInitialized = True
+                    CardHeight = BlitzCards.CardHeight
+                    CardWidth = BlitzCards.CardWidth
+                    Return True
+                End If
+            Catch ex As Exception
+                MsgBox(ex.Message, MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
         ''' Paints a card at the given X Y location.
         ''' </summary>
         ''' <param name="DrawingSurface"></param>
@@ -156,7 +178,7 @@ Namespace Objects
         ''' <remarks></remarks>
         Public Shared Sub PaintCard(ByVal DrawingSurface As Graphics, ByVal XLoc As Integer, ByVal YLoc As Integer, _
                                     ByVal Card As Byte, ByVal Type As Byte)
-            DrawCard(DrawingSurface, XLoc, YLoc, Card, Type)
+            BlitzCards.DrawCard(DrawingSurface, XLoc, YLoc, Card, Type)
         End Sub
 
         ''' <summary>
