@@ -596,6 +596,8 @@ Public Class GameTable
     Private Sub DetermineWinner()
         Dim i As Byte
         Dim LowestScore As Byte
+        Dim tie As Boolean
+        Dim totalLosers As Byte
 
         ' If no one has knocked or no one has Blitz
         If KnockActive Or Not BlitzActive Then
@@ -609,8 +611,13 @@ Public Class GameTable
 
             ' Find the players who score matched the lowest score
             For i = 1 To 4
-                If _player(i).InGame And GetScore(i) = LowestScore Then _player(i).Flag = True
+                If _player(i).InGame And GetScore(i) = LowestScore Then
+                    _player(i).Flag = True
+                    totalLosers += 1
+                End If
             Next
+
+            If totalLosers > 1 Then tie = True
         Else
             ' Flag players who didn't have Blitz
             For i = 1 To 4
@@ -631,6 +638,8 @@ Public Class GameTable
         End If
 
         For i = 1 To 4
+            If _player(i).Flag And i = Knocker And tie Then _player(i).Flag = False
+
             ' Remove 1 token for any flagged player
             If _player(i).Flag And _player(i).InGame Then
                 _player(i).RemoveToken(1)
