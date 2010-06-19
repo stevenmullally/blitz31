@@ -77,8 +77,8 @@
     <Compile Include="About.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Card.vb" />
-    <Compile Include="Player.vb" />
+    <Compile Include="Objects\Card.vb" />
+    <Compile Include="Objects\Player.vb" />
     <Compile Include="GameTable.Designer.vb">
       <DependentUpon>GameTable.vb</DependentUpon>
     </Compile>
