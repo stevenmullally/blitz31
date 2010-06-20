@@ -536,7 +536,7 @@ Public Class GameTable
         End If
 
         ' Check if player has a blitz
-        If HasBlitz(CurrentPlayer) And RoundActive And Not KnockActive Then
+        If HasBlitz(CurrentPlayer) And RoundActive Then
             BlitzActive = True
             RoundActive = False
         End If
@@ -600,7 +600,7 @@ Public Class GameTable
         Dim totalLosers As Byte
 
         ' If no one has knocked or no one has Blitz
-        If KnockActive Or Not BlitzActive Then
+        If KnockActive And Not BlitzActive Then
             LowestScore = 32
 
             ' Find the lowest score of the round
