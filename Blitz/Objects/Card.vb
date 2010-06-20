@@ -1,4 +1,5 @@
-﻿'    Copyright (C) 2009-2010  Ryan Skeldon <psykad@gmail.com>
+﻿'    Blitz, a simple draw and discard game, suitable for players of all ages.
+'    Copyright (C) 2009-2010  Ryan Skeldon <psykad@gmail.com>
 '
 '    This program is free software; you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
