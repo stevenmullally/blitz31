@@ -312,7 +312,6 @@ Public Class GameTable
                                     sumA += .GetCardVal(i)
                                 Else
                                     sumB += .GetCardVal(i)
-                                    cardToTake = .GetCardPos(i)
                                 End If
                             Next i
 
