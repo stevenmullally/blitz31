@@ -226,24 +226,20 @@ Namespace Objects
         End Sub
 
         ''' <summary>
-        ''' Returns the flag status a card in the player's hand.
+        ''' Gets or sets the specified card 
         ''' </summary>
-        ''' <param name="Card"></param>
+        ''' <param name="card"></param>
+        ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetFlag(ByVal Card As Byte) As Boolean
-            Return _hand(Card).Flag
-        End Function
-
-        ''' <summary>
-        ''' Sets the status of a card in the player's hand.
-        ''' </summary>
-        ''' <param name="Card"></param>
-        ''' <param name="Status"></param>
-        ''' <remarks></remarks>
-        Public Sub SetFlag(ByVal Card As Byte, ByVal Status As Boolean)
-            _hand(Card).Flag = Status
-        End Sub
+        Public Property CardFlag(ByVal card As Byte)
+            Get
+                Return _hand(card).Flag
+            End Get
+            Set(ByVal value)
+                _hand(card).Flag = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' Get the value of a card in the player's hand.
@@ -361,8 +357,8 @@ Namespace Objects
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function _freeCard() As Byte
-            For i As Byte = 0 To UBound(_hand)
-                If Not _hand(i).InUse Then Return i
+            For _freeCard = 0 To UBound(_hand)
+                If Not _hand(_freeCard).InUse Then Return _freeCard
             Next
         End Function
 #End Region
