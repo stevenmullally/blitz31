@@ -221,7 +221,7 @@ Public Class GameTable
     End Sub
 
     Private Sub ComputerTurn()
-        Dim masterSuit As Byte
+        Dim masterSuit As Byte = GetMasterSuit(CurrentPlayer)
         Dim suits(3) As Byte
         Dim highestCard As Byte
         Dim lowestCard As Byte
@@ -239,33 +239,32 @@ Public Class GameTable
             TakingTurn = True
         End SyncLock
 
-        ' Determine if computer should knock
         If Not KnockActive Then
-            Dim goal As Byte
+            If Deck(DiscardTop).SuitVal <> masterSuit Then
+                Dim goal As Byte
 
-            If CardsLeft() >= 20 Then
-                goal = 26
-            ElseIf CardsLeft() <= 19 Then
-                goal = 28
-            End If
+                If CardsLeft() >= 20 Then
+                    goal = 25
+                ElseIf CardsLeft() <= 19 Then
+                    goal = 29
+                End If
 
-            If GetScore(CurrentPlayer) > goal Then
-                Knocker = CurrentPlayer
-                KnockActive = True
+                If GetScore(CurrentPlayer) > goal Then
+                    Knocker = CurrentPlayer
+                    KnockActive = True
+                End If
             End If
         End If
 
-        ' Take turn if no one has knocked, or someone has and it wasn't the current player
         If Not KnockActive Or (KnockActive And Knocker <> CurrentPlayer) Then
             With Players(CurrentPlayer)
-                masterSuit = GetMasterSuit(CurrentPlayer)
-
-                ' Get count of each suit in hand
                 For i = 0 To 2
                     suits(.GetCardSuit(i)) += 1
                 Next i
 
-                sumA = 0 : sumB = 0
+                sumA = 0
+                sumB = 0
+
                 For i = 0 To 2
                     If .GetCardSuit(i) = masterSuit Then
                         .CardFlag(i) = True
@@ -276,7 +275,6 @@ Public Class GameTable
 
                 Thread.Sleep(1000)
 
-                ' Look for a card to draw
                 If Deck(DiscardTop).SuitVal = masterSuit Then
                     sumA += Deck(DiscardTop).Value
 
@@ -391,14 +389,12 @@ Public Class GameTable
                     MoveCard(CardOwners.Discard, CurrentPlayer, cardToTake)
                 End If
 
-                ' Refresh screen to show the new card in hand
                 RefreshScreen()
 
-                ' Slow down game while computer decides which card to discard
                 Thread.Sleep(1000)
 
-                ' Discard a card
-                sumA = 0 : sumB = 0
+                sumA = 0
+                sumB = 0
 
                 For i = 0 To 3
                     suits(i) = 0
@@ -508,10 +504,8 @@ Public Class GameTable
             End With
         End If
 
-        ' Refresh screen to show new hand
         RefreshScreen()
 
-        ' End the computer's turn
         SyncLock SyncObj
             TakingTurn = False
         End SyncLock
@@ -980,9 +974,9 @@ Public Class GameTable
 
         With Players(player)
             ' Find out the count of each suit in the hand, reset the flag for each card
-            For x As Byte = 0 To 2
-                suits(.GetCardSuit(x)) += 1
-                .CardFlag(x) = False
+            For i = 0 To 2
+                suits(.GetCardSuit(i)) += 1
+                .CardFlag(i) = False
             Next
 
             ' Find out which suit has the most cards
@@ -999,11 +993,11 @@ Public Class GameTable
                     Next
                     masterSuit = .GetCardSuit(highestCard)
                     .CardFlag(highestCard) = True
-
                 Case 2 ' There were 2 cards with the same suit, leaving 1 remainder
                     ' Determine if the sum of the 2 matching cards is greater than
                     ' or less than the remaining card.
-                    sumA = 0 : sumB = 0
+                    sumA = 0
+                    sumB = 0
 
                     For i = 0 To 2
                         If .GetCardSuit(i) = masterSuit Then
@@ -1014,12 +1008,13 @@ Public Class GameTable
                         End If
                     Next
 
-                    If sumA < sumB Then
-                        For i = 0 To 2
+                    For i = 0 To 2
+                        If sumA > sumB Then
+                            If .CardFlag(i) = True Then masterSuit = .GetCardSuit(i)
+                        Else
                             If .CardFlag(i) = False Then masterSuit = .GetCardSuit(i)
-                        Next
-                    End If
-
+                        End If
+                    Next
                 Case 3 ' All cards had the same suit
                     ' Nothing to do. Set MasterSuit to any card in hand
                     For i = 0 To 2
