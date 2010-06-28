@@ -29,7 +29,7 @@ Namespace Objects
             _mode = Mode
             _tokens = 4
 
-            ResetPlayer()
+            ResetHand()
         End Sub
 
 #Region "Properties"
@@ -199,6 +199,22 @@ Namespace Objects
             End Set
         End Property
 
+        Private _inGame As Boolean
+        ''' <summary>
+        ''' Gets or sets if the player is in the game.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property InGame() As Boolean
+            Get
+                Return _inGame
+            End Get
+            Set(ByVal value As Boolean)
+                _inGame = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' Contains the list of possible player modes.
         ''' </summary>
@@ -212,17 +228,17 @@ Namespace Objects
 
 #Region "Public Methods"
         ''' <summary>
-        ''' Resets the player's stats for a new game.
+        ''' Resets the player's hand for a new game.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub ResetPlayer()
-            For i As Byte = 0 To UBound(_hand)
+        Public Sub ResetHand()
+            Dim i As Byte
+
+            For i = 0 To UBound(_hand)
                 _hand(i) = New Card(Nothing)
             Next i
 
             _totalCards = 0
-            _score = 0
-            _flag = False
         End Sub
 
         ''' <summary>
@@ -335,19 +351,6 @@ Namespace Objects
         Public Sub RemoveToken(ByVal value As Byte)
             _tokens -= value
         End Sub
-
-        ''' <summary>
-        ''' Returns the player's status in the game.
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function InGame() As Boolean
-            If _tokens >= 0 Then
-                Return True
-            Else
-                Return False
-            End If
-        End Function
 #End Region
 
 #Region "Private Methods"

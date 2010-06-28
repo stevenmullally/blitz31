@@ -15,10 +15,11 @@
 '    along with this program; if not, write to the Free Software
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Option Explicit On
+Imports System.Threading
+Imports System.IO
 Imports Blitz.Objects
 Imports Blitz.Objects.Player
 Imports Blitz.Objects.Card
-Imports System.Threading
 
 Public Class GameTable
 
@@ -30,9 +31,21 @@ Public Class GameTable
         Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         Me.UpdateStyles()
 
+        ' Initialize card library
+        Try
+            If Not Card.Initialize() Then Exit Sub
+        Catch ex As Exception
+            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            Exit Sub
+        End Try
+
         ' Clear status labels
         SetStatus("", 0, True)
         UpdateScores(False)
+
+        CreatePlayers()
+
+        LoadSettings()
     End Sub
 
 #Region "Variable Declarations"
@@ -63,6 +76,7 @@ Public Class GameTable
     Private SyncObj As New Object
     Private TakingTurn As Boolean
     Private Delegate Sub SimpleCallback()
+    Private SettingsFile As String = Application.StartupPath & "\settings.ini"
 
     Private Enum CardOwners
         Deck = 0
@@ -77,13 +91,7 @@ Public Class GameTable
 
 #Region "Main Game Methods"
     Private Sub NewGame()
-        ' Initialize card library
-        Try
-            If Not Card.Initialize() Then Exit Sub
-        Catch ex As Exception
-            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
-            Exit Sub
-        End Try
+        Dim i As Byte
 
         ' Get a lock on SyncObj to check if a computer thread is running
         SyncLock SyncObj
@@ -103,8 +111,12 @@ Public Class GameTable
         GameActive = False
         RoundActive = False
 
-        ' Create the players and set the dealer
-        CreatePlayers()
+        ' Setup the players and dealer
+        For i = 1 To 4
+            Players(i).Tokens = 4
+            Players(i).InGame = True
+        Next
+
         Dealer = 4
         CurrentPlayer = 1
 
@@ -125,8 +137,15 @@ Public Class GameTable
         ' Change cursor to wait while round is setup
         Cursor.Current = Cursors.WaitCursor
 
-        ' Reset Players and Deck
-        ResetPlayers()
+        KnockActive = False
+        BlitzActive = False
+        Knocker = Nothing
+
+        For i = 1 To 4
+            Players(i).ResetHand()
+            Players(i).Flag = False
+        Next
+
         ResetDeck()
 
         ' Choose a seed for the game
@@ -557,20 +576,28 @@ Public Class GameTable
         ' Hide player controls
         PlayerControls(False, False, False, False)
 
-        ' Check to see if game is over
+        UpdateScores(True)
+
+        Me.Refresh()
+
         Dim activePlayers As Byte = 0
 
         For i = 1 To 4
-            If Players(i).InGame Then activePlayers += 1
+            With Players(i)
+                If .Tokens >= 0 Then
+                    .InGame = True
+                    activePlayers += 1
+                Else
+                    .InGame = False
+                End If
+            End With
         Next
 
-        If activePlayers = 1 Or Not Players(1).InGame Then
+        If activePlayers = 1 Or Players(1).InGame = False Then
             GameOver()
         Else
             btnNewRound.Visible = True
         End If
-
-        UpdateScores(True)
 
         ' Set dealer for next round
         Do
@@ -584,8 +611,6 @@ Public Class GameTable
             CurrentPlayer += 1
             If CurrentPlayer > 4 Then CurrentPlayer = 1
         Loop Until Players(CurrentPlayer).InGame
-
-        Me.Refresh()
     End Sub
 
     Private Sub DetermineWinner()
@@ -649,6 +674,13 @@ Public Class GameTable
     Private Sub GameOver()
         ' Hide player controls
         SetStatus("Game Over", 0, True)
+
+        If Players(1).InGame = False Then
+            MsgBox("You lose!", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Game Over")
+        Else
+            MsgBox("You win!", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Game Over")
+        End If
+
         PlayerControls(False, False, False, False)
     End Sub
 #End Region
@@ -671,7 +703,7 @@ Public Class GameTable
         Players(3).Name = "Player 3"
         Players(4).Name = "Player 4"
 
-        ' Set objDeck and discard locations
+        ' Set Deck and discard locations
         Players(CardOwners.Deck).X = 290 - Card.CardWidth
         Players(CardOwners.Deck).Y = 300 - (Card.CardHeight / 2)
         Players(CardOwners.Discard).X = 310
@@ -735,18 +767,6 @@ Public Class GameTable
 
         For i = 0 To UBound(Deck)
             Deck(i).Status = CardFront
-        Next
-    End Sub
-
-    Private Sub ResetPlayers()
-        Dim i As Byte
-
-        KnockActive = False
-        Knocker = Nothing
-        BlitzActive = False
-
-        For i = 0 To UBound(Players)
-            Players(i).ResetPlayer()
         Next
     End Sub
 
@@ -1049,6 +1069,51 @@ Public Class GameTable
             Return False
         End If
     End Function
+#End Region
+
+#Region "Load / Save Methods"
+    Private Sub SaveSettings()
+
+    End Sub
+
+    Private Sub LoadSettings()
+        If File.Exists(SettingsFile) Then
+            Dim fileStream As New StreamReader(SettingsFile)
+            Dim buffer1 As String
+            Dim buffer2() As String
+
+            With fileStream
+                Do Until .EndOfStream
+                    buffer1 = .ReadLine
+
+                    buffer2 = buffer1.Split("=")
+
+                    Select Case buffer2(0)
+                        Case "player1name"
+                            Players(1).Name = buffer2(1)
+                        Case "player2name"
+                            Players(2).Name = buffer2(1)
+                        Case "player3name"
+                            Players(3).Name = buffer2(1)
+                        Case "player4name"
+                            Players(4).Name = buffer2(1)
+                    End Select
+                Loop
+            End With
+        Else
+            Dim fileStream As New StreamWriter(SettingsFile)
+
+            With fileStream
+                .WriteLine("player1name=" & Players(1).Name)
+                .WriteLine("player2name=" & Players(2).Name)
+                .WriteLine("player3name=" & Players(3).Name)
+                .WriteLine("player4name=" & Players(4).Name)
+
+                .Flush()
+                .Close()
+            End With
+        End If
+    End Sub
 #End Region
 
 #Region "GameTable Handlers"
