@@ -23,6 +23,10 @@ Imports Blitz.Objects.Card
 
 Public Class GameTable
 
+    ''' <summary>
+    ''' Initializes game table.
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Sub New()
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -39,44 +43,51 @@ Public Class GameTable
             Exit Sub
         End Try
 
-        ' Clear status labels
         SetStatus("", 0, True)
         UpdateScores(False)
-
         CreatePlayers()
-
         LoadSettings()
     End Sub
 
 #Region "Variable Declarations"
+    Private Seed As Integer = 0
+    Private SettingsFile As String = Application.StartupPath & "\settings.ini"
+
     Private Deck(51) As Card
     Private Players(5) As Player
-    Private Seed As Integer = 0
+
     Private CurrentPlayer As Byte = 0
     Private Knocker As Byte = 0
     Private Winner As Byte = 0
     Private Dealer As Byte = 0
+
+    ' Card pointers
     Private DiscardTop As Byte = NoCard
     Private DiscardBottom As Byte = NoCard
     Private PickupCard As Byte = NoCard
     Private DiscardCount As Byte = 0
-    Private CardOffset_X As Byte = 16
-    Private CardOffset_Y As Byte = 30
+
+    ' Game states
     Private GameActive As Boolean = False
     Private RoundActive As Boolean = False
     Private BlitzActive As Boolean = False
     Private KnockActive As Boolean = False
     Private DebugMode As Boolean = False
+
+    ' Card properties
     Private Const NoCard As Byte = 52
     Private Const DeckPattern As Byte = 52
     Private Const CardFront As Byte = 0
     Private Const CardBack As Byte = 1
     Private Const CardInverted As Byte = 2
+    Private CardOffset_X As Byte = 16
+    Private CardOffset_Y As Byte = 30
+
+    ' Threading objects
     Private ComputerThread As Thread
     Private SyncObj As New Object
     Private TakingTurn As Boolean
     Private Delegate Sub SimpleCallback()
-    Private SettingsFile As String = Application.StartupPath & "\settings.ini"
 
     Private Enum CardOwners
         Deck = 0
@@ -1139,7 +1150,7 @@ Public Class GameTable
 
         Dim _x As Integer = e.X
         Dim _y As Integer = e.Y
-        Dim iCard As Integer = -1
+        Dim iCard As Integer = NoCard
         Dim iSelectedCard As Byte = CardOwners.Deck
         Dim i As Byte
 
@@ -1171,7 +1182,7 @@ Public Class GameTable
         Next i
 
         ' Decide what to do if a valid card was selected
-        If iCard <> -1 Then
+        If iCard <> NoCard Then
             Deck(iCard).Status = CardInverted
 
             If iSelectedCard = 1 Then
