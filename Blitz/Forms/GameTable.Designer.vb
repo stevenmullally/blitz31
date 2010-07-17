@@ -26,6 +26,7 @@ Partial Class GameTable
         Me.MainMenu = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.NewGameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.CheckForUpdatesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -63,7 +64,7 @@ Partial Class GameTable
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewGameToolStripMenuItem, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewGameToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "File"
@@ -72,13 +73,20 @@ Partial Class GameTable
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.NewGameToolStripMenuItem.Text = "New Game"
+        '
+        'OptionsToolStripMenuItem
+        '
+        Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
+        Me.OptionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4
+        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OptionsToolStripMenuItem.Text = "Options"
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'HelpToolStripMenuItem
@@ -98,7 +106,7 @@ Partial Class GameTable
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
-        Me.AboutToolStripMenuItem.Text = "About"
+        Me.AboutToolStripMenuItem.Text = "About Blitz"
         '
         'btnDrawCard
         '
@@ -342,5 +350,6 @@ Partial Class GameTable
     Friend WithEvents lblScore3 As System.Windows.Forms.Label
     Friend WithEvents lblScoreName3 As System.Windows.Forms.Label
     Friend WithEvents btnNewRound As System.Windows.Forms.Button
+    Friend WithEvents OptionsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

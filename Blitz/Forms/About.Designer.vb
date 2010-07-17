@@ -26,6 +26,7 @@ Partial Class About
         Me.lblAppAuthor = New System.Windows.Forms.Label
         Me.lblAppVersion = New System.Windows.Forms.Label
         Me.btnOK = New System.Windows.Forms.Button
+        Me.lblSiteURL = New System.Windows.Forms.LinkLabel
         Me.SuspendLayout()
         '
         'lblAppName
@@ -60,18 +61,29 @@ Partial Class About
         '
         'btnOK
         '
-        Me.btnOK.Location = New System.Drawing.Point(84, 128)
+        Me.btnOK.Location = New System.Drawing.Point(81, 157)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 3
         Me.btnOK.Text = "OK"
         Me.btnOK.UseVisualStyleBackColor = True
         '
+        'lblSiteURL
+        '
+        Me.lblSiteURL.Location = New System.Drawing.Point(12, 119)
+        Me.lblSiteURL.Name = "lblSiteURL"
+        Me.lblSiteURL.Size = New System.Drawing.Size(216, 23)
+        Me.lblSiteURL.TabIndex = 4
+        Me.lblSiteURL.TabStop = True
+        Me.lblSiteURL.Text = "SiteURL"
+        Me.lblSiteURL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'About
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(240, 163)
+        Me.ClientSize = New System.Drawing.Size(240, 192)
+        Me.Controls.Add(Me.lblSiteURL)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.lblAppVersion)
         Me.Controls.Add(Me.lblAppAuthor)
@@ -91,4 +103,5 @@ Partial Class About
     Friend WithEvents lblAppAuthor As System.Windows.Forms.Label
     Friend WithEvents lblAppVersion As System.Windows.Forms.Label
     Friend WithEvents btnOK As System.Windows.Forms.Button
+    Friend WithEvents lblSiteURL As System.Windows.Forms.LinkLabel
 End Class
