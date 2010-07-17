@@ -54,7 +54,7 @@ Public Class GameTable
     Private SettingsFile As String = Application.StartupPath & "\settings.ini"
 
     Private Deck(51) As Card
-    Private Players(5) As Player
+    Public Players(5) As Player
 
     Private CurrentPlayer As Byte = 0
     Private Knocker As Byte = 0
@@ -68,7 +68,7 @@ Public Class GameTable
     Private DiscardCount As Byte = 0
 
     ' Game states
-    Private GameActive As Boolean = False
+    Public GameActive As Boolean = False
     Private RoundActive As Boolean = False
     Private BlitzActive As Boolean = False
     Private KnockActive As Boolean = False
@@ -549,7 +549,7 @@ Public Class GameTable
         Try
             Me.Invoke(cb)
         Catch ex As Exception
-            MsgBox(ex.Message)
+
         End Try
     End Sub
 
@@ -854,7 +854,7 @@ Public Class GameTable
         End Select
     End Sub
 
-    Private Sub UpdateScores(ByVal showScoreBox As Boolean)
+    Public Sub UpdateScores(ByVal showScoreBox As Boolean)
         If showScoreBox Then
             ScoreBox.Visible = True
             lblScoreName1.Text = Players(1).Name
@@ -1083,8 +1083,18 @@ Public Class GameTable
 #End Region
 
 #Region "Load / Save Methods"
-    Private Sub SaveSettings()
+    Public Sub SaveSettings()
+        Dim fileStream As New StreamWriter(SettingsFile)
 
+        With fileStream
+            .WriteLine("player1name=" & Players(1).Name)
+            .WriteLine("player2name=" & Players(2).Name)
+            .WriteLine("player3name=" & Players(3).Name)
+            .WriteLine("player4name=" & Players(4).Name)
+
+            .Flush()
+            .Close()
+        End With
     End Sub
 
     Private Sub LoadSettings()
@@ -1110,6 +1120,8 @@ Public Class GameTable
                             Players(4).Name = buffer2(1)
                     End Select
                 Loop
+
+                .Close()
             End With
         Else
             Dim fileStream As New StreamWriter(SettingsFile)
@@ -1328,7 +1340,7 @@ Public Class GameTable
         Try
             Me.Invoke(cb)
         Catch ex As Exception
-            MsgBox(ex.Message)
+
         End Try
     End Sub
 #End Region
@@ -1436,6 +1448,10 @@ Public Class GameTable
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         About.Show()
+    End Sub
+
+    Private Sub OptionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OptionsToolStripMenuItem.Click
+        Options.Show()
     End Sub
 #End Region
 End Class

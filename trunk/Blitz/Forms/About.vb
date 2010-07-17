@@ -19,16 +19,23 @@ Option Explicit On
 Public Class About
 
 #Region "Form Handlers"
+    Private appSiteURL As String = "http://code.google.com/p/blitz31"
+
     Private Sub About_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim versionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
 
         lblAppName.Text = Application.ProductName
         lblAppAuthor.Text = "by Ryan Skeldon"
         lblAppVersion.Text = "Version " & versionInfo.ProductVersion
+        lblSiteURL.Text = appSiteURL
     End Sub
 
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         Me.Close()
     End Sub
 #End Region
+
+    Private Sub lblSiteURL_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblSiteURL.LinkClicked
+        System.Diagnostics.Process.Start(appSiteURL)
+    End Sub
 End Class
