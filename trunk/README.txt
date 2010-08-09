@@ -20,8 +20,14 @@
 
 -= Installation Requirements =-
 
-   * Operating System: Windows XP/2000/Vista/7 (32-bit ONLY)
+   * Operating System: Windows XP/2000/Vista/7 (32/64-bit compatible)
    * Other: Microsoft .NET Framework 3.5 or Higher
+
+
+-= Rules =-
+
+   For rules of Blitz please visit http://www.pagat.com/draw/scat.html
+
 
 -= Troubleshooting =-
 
