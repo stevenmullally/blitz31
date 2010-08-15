@@ -17,6 +17,8 @@
 Option Explicit On
 Imports System.Threading
 Imports System.IO
+Imports System.Security.Cryptography
+Imports System.Text
 Imports Blitz.Objects
 Imports Blitz.Objects.Player
 Imports Blitz.Objects.Card
@@ -52,6 +54,8 @@ Public Class GameTable
 #Region "Variable Declarations"
     Private Seed As Integer = 0
     Private SettingsFile As String = Application.StartupPath & "\settings.ini"
+    Private FirstRun As Boolean = True
+    Private UpdateOnStart As Boolean = True
 
     Private Deck(51) As Card
     Public Players(5) As Player
@@ -1091,6 +1095,8 @@ Public Class GameTable
             .WriteLine("player2name=" & Players(2).Name)
             .WriteLine("player3name=" & Players(3).Name)
             .WriteLine("player4name=" & Players(4).Name)
+            .WriteLine("firstrun=" & FirstRun)
+            .WriteLine("updateonstart=" & UpdateOnStart)
 
             .Flush()
             .Close()
@@ -1118,6 +1124,10 @@ Public Class GameTable
                             Players(3).Name = buffer2(1)
                         Case "player4name"
                             Players(4).Name = buffer2(1)
+                        Case "firstrun"
+                            FirstRun = buffer2(1)
+                        Case "updateonstart"
+                            UpdateOnStart = buffer2(1)
                     End Select
                 Loop
 
@@ -1131,6 +1141,8 @@ Public Class GameTable
                 .WriteLine("player2name=" & Players(2).Name)
                 .WriteLine("player3name=" & Players(3).Name)
                 .WriteLine("player4name=" & Players(4).Name)
+                .WriteLine("firstrun=true")
+                .WriteLine("updateonstart=" & UpdateOnStart)
 
                 .Flush()
                 .Close()
@@ -1343,6 +1355,20 @@ Public Class GameTable
 
         End Try
     End Sub
+
+    Private Sub GameTable_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
+        Dim updateList As String = Application.StartupPath & "\updatelist.txt"
+
+        If FirstRun Or File.Exists(updateList) Then
+            If File.Exists(updateList) Then Kill(updateList)
+            FirstRun = False
+            SaveSettings()
+        End If
+
+        If UpdateOnStart Then
+            RunAutoUpdate(False)
+        End If
+    End Sub
 #End Region
 
 #Region "GameTable Component Handlers"
@@ -1405,25 +1431,36 @@ Public Class GameTable
     End Sub
 
     Private Sub CheckForUpdatesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckForUpdatesToolStripMenuItem.Click
+        RunAutoUpdate(True)
+    End Sub
+
+    Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
+        About.Show()
+    End Sub
+
+    Private Sub OptionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OptionsToolStripMenuItem.Click
+        Options.Show()
+    End Sub
+
+    Private Sub RunAutoUpdate(ByVal showPopups As Boolean)
         Try
             Dim PingOut As New Net.NetworkInformation.Ping
             Dim PingIn As Net.NetworkInformation.PingReply
+            Dim CurrentBuild As String = getFileSHA(Application.ExecutablePath)
 
             ' Ping Google
             PingIn = PingOut.Send("www.google.com", 3000)
 
             If PingIn.Status = Net.NetworkInformation.IPStatus.Success Then
-                Dim UpdateInfoUrl As String = "http://www.psykad.com/software/blitz/versioninfo.txt"
+                Dim UpdateInfoUrl As String = "http://www.psykad.com/software/blitz/updateinfo.txt"
                 Dim wc As New Net.WebClient
 
                 ' Download info on newest build
                 Dim wcbuffer As Byte() = wc.DownloadData(UpdateInfoUrl)
-                Dim VersionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
-                Dim CurrentBuild As Integer = Convert.ToInt32(VersionInfo.ProductPrivatePart)
-                Dim NewestBuild As Integer = Convert.ToInt32(System.Text.ASCIIEncoding.ASCII.GetString(wcbuffer))
+                Dim NewestBuild As String = System.Text.ASCIIEncoding.ASCII.GetString(wcbuffer)
 
                 ' Check to see if the current build is up to date
-                If CurrentBuild < NewestBuild Or System.IO.File.Exists(Application.StartupPath & "\debug") Then
+                If CurrentBuild <> NewestBuild Or System.IO.File.Exists(Application.StartupPath & "\debug") Then
                     Dim MsgBoxAnswer As MsgBoxResult
                     Dim SourceFileURL As String = "http://www.psykad.com/software/blitz/bin/AutoUpdater.exe"
                     Dim DestinationFileURL As String = Application.StartupPath & "\AutoUpdater.exe"
@@ -1436,22 +1473,32 @@ Public Class GameTable
                         Application.Exit()
                     End If
                 Else
-                    MsgBox("There are no updates available.", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Blitz Update")
+                    If showPopups Then MsgBox("There are no updates available.", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Blitz Update")
                 End If
             Else
-                MsgBox("Unable to perform update", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Update Failed")
+                If showPopups Then MsgBox("Unable to perform update", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Update Failed")
             End If
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical + MsgBoxStyle.OkOnly)
         End Try
     End Sub
 
-    Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
-        About.Show()
-    End Sub
+    Private Function getFileSHA(ByVal filePath As String) As String
+        Dim shaProvider As SHA1CryptoServiceProvider = New SHA1CryptoServiceProvider
+        Dim fStream As FileStream = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 8192)
 
-    Private Sub OptionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OptionsToolStripMenuItem.Click
-        Options.Show()
-    End Sub
+        shaProvider.ComputeHash(fStream)
+        fStream.Close()
+
+        Dim hash As Byte() = shaProvider.Hash
+        Dim buff As StringBuilder = New StringBuilder
+        Dim hashByte As Byte
+
+        For Each hashByte In hash
+            buff.Append(String.Format("{0:X2}", hashByte))
+        Next
+
+        Return buff.ToString
+    End Function
 #End Region
 End Class
