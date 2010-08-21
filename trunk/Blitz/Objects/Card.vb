@@ -26,13 +26,43 @@ Namespace Objects
         ''' <param name="value">Location of the card in a zero-based deck. (0 - 51)</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal value As Byte)
-            _position = value
+            Position = value
         End Sub
 
 #Region "Properties"
-        Private Shared LibraryInitialized As Boolean
-        Public Shared CardWidth As Integer
-        Public Shared CardHeight As Integer
+        Private Shared _libraryInitialized As Boolean
+
+        Private Shared _cardWidth As Integer
+        ''' <summary>
+        ''' Gets or sets the card width.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Property CardWidth() As Integer
+            Get
+                Return _cardWidth
+            End Get
+            Set(ByVal value As Integer)
+                _cardWidth = value
+            End Set
+        End Property
+
+        Private Shared _cardHeight As Integer
+        ''' <summary>
+        ''' Gets or sets the card height.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Property CardHeight() As Integer
+            Get
+                Return _cardHeight
+            End Get
+            Set(ByVal value As Integer)
+                _cardHeight = value
+            End Set
+        End Property
 
         Private _flag As Boolean = False
         ''' <summary>
@@ -153,11 +183,11 @@ Namespace Objects
         ''' <returns></returns>
         ''' <remarks>Used to setup card dimension information.</remarks>
         Public Shared Function Initialize() As Boolean
-            If LibraryInitialized Then Return True
+            If _libraryInitialized Then Return True
 
             Try
                 If BlitzCards.InitCards Then
-                    LibraryInitialized = True
+                    _libraryInitialized = True
                     CardHeight = BlitzCards.CardHeight
                     CardWidth = BlitzCards.CardWidth
                     Return True
@@ -171,15 +201,15 @@ Namespace Objects
         ''' <summary>
         ''' Paints a card at the given X Y location.
         ''' </summary>
-        ''' <param name="DrawingSurface"></param>
-        ''' <param name="XLoc">X location of the card.</param>
-        ''' <param name="YLoc">Y location of the card.</param>
-        ''' <param name="Card">Card position in the deck.</param>
-        ''' <param name="Type">Card face type.</param>
+        ''' <param name="drawingSurface"></param>
+        ''' <param name="xLoc">X location of the card.</param>
+        ''' <param name="yLoc">Y location of the card.</param>
+        ''' <param name="card">Card position in the deck.</param>
+        ''' <param name="type">Card face type.</param>
         ''' <remarks></remarks>
-        Public Shared Sub PaintCard(ByVal DrawingSurface As Graphics, ByVal XLoc As Integer, ByVal YLoc As Integer, _
-                                    ByVal Card As Byte, ByVal Type As Byte)
-            BlitzCards.DrawCard(DrawingSurface, XLoc, YLoc, Card, Type)
+        Public Shared Sub PaintCard(ByVal drawingSurface As Graphics, ByVal xLoc As Integer, ByVal yLoc As Integer, _
+                                    ByVal card As Byte, ByVal type As Byte)
+            BlitzCards.DrawCard(drawingSurface, xLoc, yLoc, card, type)
         End Sub
 
         ''' <summary>
@@ -188,7 +218,7 @@ Namespace Objects
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function SuitVal() As Byte
-            Select Case _position
+            Select Case Position
                 Case 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48
                     SuitVal = Suits.Clubs
                 Case 1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49
@@ -226,7 +256,7 @@ Namespace Objects
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function FaceVal() As Byte
-            Return (_position - SuitVal()) / 4
+            Return (Position - SuitVal()) / 4
         End Function
 
         ''' <summary>
