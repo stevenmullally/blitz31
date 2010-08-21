@@ -34,6 +34,7 @@ Partial Class Options
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnDefault = New System.Windows.Forms.Button
+        Me.chkStartupUpdate = New System.Windows.Forms.CheckBox
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -124,7 +125,7 @@ Partial Class Options
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(12, 154)
+        Me.btnOk.Location = New System.Drawing.Point(12, 177)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(75, 23)
         Me.btnOk.TabIndex = 1
@@ -134,7 +135,7 @@ Partial Class Options
         'btnCancel
         '
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(113, 154)
+        Me.btnCancel.Location = New System.Drawing.Point(113, 177)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 2
@@ -143,12 +144,22 @@ Partial Class Options
         '
         'btnDefault
         '
-        Me.btnDefault.Location = New System.Drawing.Point(61, 183)
+        Me.btnDefault.Location = New System.Drawing.Point(61, 206)
         Me.btnDefault.Name = "btnDefault"
         Me.btnDefault.Size = New System.Drawing.Size(75, 23)
         Me.btnDefault.TabIndex = 3
         Me.btnDefault.Text = "Default"
         Me.btnDefault.UseVisualStyleBackColor = True
+        '
+        'chkStartupUpdate
+        '
+        Me.chkStartupUpdate.AutoSize = True
+        Me.chkStartupUpdate.Location = New System.Drawing.Point(21, 154)
+        Me.chkStartupUpdate.Name = "chkStartupUpdate"
+        Me.chkStartupUpdate.Size = New System.Drawing.Size(166, 17)
+        Me.chkStartupUpdate.TabIndex = 4
+        Me.chkStartupUpdate.Text = "Check for updates on startup."
+        Me.chkStartupUpdate.UseVisualStyleBackColor = True
         '
         'Options
         '
@@ -156,7 +167,8 @@ Partial Class Options
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(202, 217)
+        Me.ClientSize = New System.Drawing.Size(202, 240)
+        Me.Controls.Add(Me.chkStartupUpdate)
         Me.Controls.Add(Me.btnDefault)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
@@ -171,6 +183,7 @@ Partial Class Options
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
@@ -185,4 +198,5 @@ Partial Class Options
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnDefault As System.Windows.Forms.Button
+    Friend WithEvents chkStartupUpdate As System.Windows.Forms.CheckBox
 End Class

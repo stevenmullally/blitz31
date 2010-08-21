@@ -55,7 +55,7 @@ Public Class GameTable
     Private Seed As Integer = 0
     Private SettingsFile As String = Application.StartupPath & "\settings.ini"
     Private FirstRun As Boolean = True
-    Private UpdateOnStart As Boolean = True
+    Public UpdateOnStart As Boolean = True
 
     Private Deck(51) As Card
     Public Players(5) As Player
@@ -1359,14 +1359,14 @@ Public Class GameTable
     Private Sub GameTable_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Dim updateList As String = Application.StartupPath & "\updatelist.txt"
 
+        If UpdateOnStart Then
+            RunAutoUpdate(False)
+        End If
+
         If FirstRun Or File.Exists(updateList) Then
             If File.Exists(updateList) Then Kill(updateList)
             FirstRun = False
             SaveSettings()
-        End If
-
-        If UpdateOnStart Then
-            RunAutoUpdate(False)
         End If
     End Sub
 #End Region
@@ -1443,44 +1443,60 @@ Public Class GameTable
     End Sub
 
     Private Sub RunAutoUpdate(ByVal showPopups As Boolean)
+        Dim PingOut As New Net.NetworkInformation.Ping
+        Dim PingIn As Net.NetworkInformation.PingReply
+        Dim CurrentBuild As String = getFileSHA(Application.ExecutablePath)
+
+        ' Check if internet connection is availible
         Try
-            Dim PingOut As New Net.NetworkInformation.Ping
-            Dim PingIn As Net.NetworkInformation.PingReply
-            Dim CurrentBuild As String = getFileSHA(Application.ExecutablePath)
+            PingIn = PingOut.Send("www.psykad.com", 3000)
+        Catch ex As Exception
+            If showPopups Then MsgBox("Unable to connect to update server." & vbCrLf & _
+                "Please check your internet connection.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Update Failed")
+            Exit Sub
+        End Try
 
-            ' Ping Google
-            PingIn = PingOut.Send("www.google.com", 3000)
+        If PingIn.Status = Net.NetworkInformation.IPStatus.Success Then
+            Dim UpdateInfoUrl As String = "http://www.psykad.com/software/blitz/updateinfo.txt"
+            Dim wc As New Net.WebClient
 
-            If PingIn.Status = Net.NetworkInformation.IPStatus.Success Then
-                Dim UpdateInfoUrl As String = "http://www.psykad.com/software/blitz/updateinfo.txt"
-                Dim wc As New Net.WebClient
+            ' Download info on newest build
+            Dim wcbuffer As Byte() = wc.DownloadData(UpdateInfoUrl)
+            Dim NewestBuild As String = System.Text.ASCIIEncoding.ASCII.GetString(wcbuffer)
 
-                ' Download info on newest build
-                Dim wcbuffer As Byte() = wc.DownloadData(UpdateInfoUrl)
-                Dim NewestBuild As String = System.Text.ASCIIEncoding.ASCII.GetString(wcbuffer)
+            ' Check to see if the current build is up to date
+            If CurrentBuild <> NewestBuild Or System.IO.File.Exists(Application.StartupPath & "\debug") Then
+                Dim MsgBoxAnswer As MsgBoxResult
+                Dim SourceFileURL As String = "http://www.psykad.com/software/blitz/bin/AutoUpdater.exe"
+                Dim DestinationFileURL As String = Application.StartupPath & "\AutoUpdater.exe"
 
-                ' Check to see if the current build is up to date
-                If CurrentBuild <> NewestBuild Or System.IO.File.Exists(Application.StartupPath & "\debug") Then
-                    Dim MsgBoxAnswer As MsgBoxResult
-                    Dim SourceFileURL As String = "http://www.psykad.com/software/blitz/bin/AutoUpdater.exe"
-                    Dim DestinationFileURL As String = Application.StartupPath & "\AutoUpdater.exe"
+                MsgBoxAnswer = MsgBox("An update is available! Would you like to update now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Blitz Update")
 
-                    MsgBoxAnswer = MsgBox("An update is available! Download update now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Blitz Update")
-
-                    If MsgBoxAnswer = MsgBoxResult.Yes Then
+                If MsgBoxAnswer = MsgBoxResult.Yes Then
+                    Try
                         wc.DownloadFile(SourceFileURL, DestinationFileURL)
                         System.Diagnostics.Process.Start(DestinationFileURL)
                         Application.Exit()
-                    End If
+                    Catch ex As Exception
+                        MsgBox(ex.Message, MsgBoxStyle.Critical + MsgBoxStyle.OkOnly)
+                    End Try
                 Else
-                    If showPopups Then MsgBox("There are no updates available.", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Blitz Update")
+                    If FirstRun And UpdateOnStart Then
+                        MsgBoxAnswer = MsgBox("Would you like to disable auto-update on startup?" & vbCrLf & _
+                            "(You can change your option in the options menu.", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
+
+                        If MsgBoxAnswer = MsgBoxResult.Yes Then
+                            UpdateOnStart = False
+                            SaveSettings()
+                        End If
+                    End If
                 End If
             Else
-                If showPopups Then MsgBox("Unable to perform update", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Update Failed")
+                If showPopups Then MsgBox("There are no updates available.", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Blitz Update")
             End If
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical + MsgBoxStyle.OkOnly)
-        End Try
+        Else
+            If showPopups Then MsgBox("Unable to perform update", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "Update Failed")
+        End If
     End Sub
 
     Private Function getFileSHA(ByVal filePath As String) As String
