@@ -25,9 +25,9 @@ Namespace Objects
         ''' <param name="Mode">Player mode.</param>
         ''' <remarks>A player is created using the given mode.
         ''' The new player is given default properties and a reset is called.</remarks>
-        Public Sub New(ByVal Mode As Modes)
-            _mode = Mode
-            _tokens = 4
+        Public Sub New(ByVal mode As Modes)
+            Me.Mode = mode
+            Tokens = 4
 
             ResetHand()
         End Sub
@@ -238,7 +238,7 @@ Namespace Objects
                 _hand(i) = New Card(Nothing)
             Next i
 
-            _totalCards = 0
+            TotalCards = 0
         End Sub
 
         ''' <summary>
@@ -304,14 +304,14 @@ Namespace Objects
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function AddCard(ByVal value As Byte) As Boolean
-            If _totalCards = 4 Then Return False
+            If TotalCards = 4 Then Return False
 
-            With _hand(_freeCard)
+            With _hand(freeCard)
                 .Position = value
                 .InUse = True
             End With
 
-            _totalCards += 1
+            TotalCards += 1
             Return True
         End Function
 
@@ -326,7 +326,7 @@ Namespace Objects
             For x = 0 To UBound(_hand)
                 If _hand(x).Position = value Then
                     _hand(x) = New Card(Nothing)
-                    _totalCards -= 1
+                    TotalCards -= 1
                     Exit For
                 End If
             Next x
@@ -349,7 +349,7 @@ Namespace Objects
         ''' <param name="value"></param>
         ''' <remarks></remarks>
         Public Sub RemoveToken(ByVal value As Byte)
-            _tokens -= value
+            Tokens -= value
         End Sub
 #End Region
 
@@ -359,9 +359,9 @@ Namespace Objects
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function _freeCard() As Byte
-            For _freeCard = 0 To UBound(_hand)
-                If Not _hand(_freeCard).InUse Then Return _freeCard
+        Private Function freeCard() As Byte
+            For freeCard = 0 To UBound(_hand)
+                If Not _hand(freeCard).InUse Then Return freeCard
             Next
         End Function
 #End Region
