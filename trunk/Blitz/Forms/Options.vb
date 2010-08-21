@@ -15,6 +15,7 @@ Public Class Options
             GameTable.Players(2).Name = txtPlayer2Name.Text
             GameTable.Players(3).Name = txtPlayer3Name.Text
             GameTable.Players(4).Name = txtPlayer4Name.Text
+            GameTable.UpdateOnStart = chkStartupUpdate.Checked
             GameTable.SaveSettings()
             GameTable.UpdateScores(GameTable.GameActive)
         End If
@@ -31,7 +32,7 @@ Public Class Options
         txtPlayer2Name.Text = GameTable.Players(2).Name
         txtPlayer3Name.Text = GameTable.Players(3).Name
         txtPlayer4Name.Text = GameTable.Players(4).Name
-
+        chkStartupUpdate.Checked = GameTable.UpdateOnStart
         saveOptions = False
     End Sub
 
