@@ -34,6 +34,7 @@ Partial Class GameTable
         'MainMenu
         '
         Me.MainMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.HelpToolStripMenuItem})
+        Me.MainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow
         Me.MainMenu.Location = New System.Drawing.Point(0, 0)
         Me.MainMenu.Name = "MainMenu"
         Me.MainMenu.Size = New System.Drawing.Size(584, 24)
@@ -52,18 +53,18 @@ Partial Class GameTable
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.NewGameToolStripMenuItem.Text = "New Game"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(148, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'HelpToolStripMenuItem
@@ -79,6 +80,7 @@ Partial Class GameTable
         Me.BackColor = System.Drawing.Color.Green
         Me.ClientSize = New System.Drawing.Size(584, 608)
         Me.Controls.Add(Me.MainMenu)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MainMenuStrip = Me.MainMenu
         Me.MaximizeBox = False
         Me.Name = "GameTable"

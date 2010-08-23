@@ -28,6 +28,8 @@ Public Class GameTable
 
     Private gameActive As Boolean
     Private roundActive As Boolean
+    Private knockActive As Boolean
+    Private blitzActive As Boolean
 
     Private currentPlayer As Byte
     Private knocker As Byte
@@ -79,11 +81,6 @@ Public Class GameTable
             Exit Sub
         End Try
 
-        If DEBUG_MODE Then
-            cardOffsetX = Card.CardWidth + 10
-            cardOffsetY = Card.CardHeight + 10
-        End If
-
         CreatePlayers()
     End Sub
 
@@ -97,6 +94,71 @@ Public Class GameTable
                 End Try
             End If
         End SyncLock
+    End Sub
+
+    Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
+        If Not gameActive Or Not roundActive Then Exit Sub
+        If Player(currentPlayer).Mode <> Objects.Player.Modes.Human Then Exit Sub
+
+        Dim x As Integer = e.X
+        Dim y As Integer = e.Y
+        Dim card As Byte
+        Dim cardOwner As Byte = CardOwners.Deck
+        Dim i As Byte
+
+        For i = 0 To UBound(deck)
+            deck(i).Invert = False
+
+            If deck(i).Owner = 1 And Player(1).TotalCards = 4 Then
+                With Player(1).HandLocation
+                    If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
+                       (y >= .Y) And (y <= (.Y + Objects.Card.CardWidth)) Then
+
+                        card = i
+                        cardOwner = 1
+                        MsgBox("YEAH")
+                    End If
+                End With
+
+                With Player(1)
+                    .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
+                End With
+            ElseIf deck(i).Owner = CardOwners.Discard Then
+                With Player(CardOwners.Discard).HandLocation
+                    If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
+                       (y >= .Y) And (y <= (.Y + Objects.Card.CardWidth)) And _
+                       Player(1).TotalCards < 4 Then
+
+                        card = i
+                        cardOwner = CardOwners.Discard
+                    End If
+                End With
+            End If
+        Next
+
+        If card <> noCard Then
+            deck(card).Invert = True
+
+            If cardOwner = 1 Then
+
+            ElseIf cardOwner = CardOwners.Discard Then
+
+            End If
+        Else
+            If Player(1).TotalCards < 4 Then
+                If knockactive Then
+
+                Else
+
+                End If
+            Else
+
+            End If
+
+            ResetInverts()
+        End If
+
+        Me.Refresh()
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
@@ -222,6 +284,9 @@ Public Class GameTable
             Me.Player(i).Tokens = 4
             Me.Player(i).InGame = True
         Next
+
+        dealer = 4
+        currentPlayer = 1
 
         gameActive = True
         Cursor.Current = Cursors.Arrow
