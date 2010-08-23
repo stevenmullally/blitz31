@@ -116,7 +116,6 @@ Public Class GameTable
 
                         card = i
                         cardOwner = 1
-                        MsgBox("YEAH")
                     End If
                 End With
 
