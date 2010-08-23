@@ -15,7 +15,6 @@
 '    along with this program; if not, write to the Free Software
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Option Explicit On
-Imports BlitzCards.CardGraphics
 
 Namespace Objects
     Public Class Card
@@ -255,7 +254,7 @@ Namespace Objects
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function FaceVal() As Byte
+        Private Function FaceVal() As Byte
             Return (Position - SuitVal()) / 4
         End Function
 

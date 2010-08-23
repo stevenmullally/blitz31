@@ -48,6 +48,7 @@ Partial Class GameTable
         Me.lblScore1 = New System.Windows.Forms.Label
         Me.lblScoreName1 = New System.Windows.Forms.Label
         Me.btnNewRound = New System.Windows.Forms.Button
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.MainMenu.SuspendLayout()
         Me.ScoreBox.SuspendLayout()
         Me.SuspendLayout()
@@ -64,49 +65,49 @@ Partial Class GameTable
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewGameToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewGameToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.ToolStripSeparator1, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
-        Me.FileToolStripMenuItem.Text = "File"
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(94, 20)
+        Me.FileToolStripMenuItem.Text = "&File"
         '
         'NewGameToolStripMenuItem
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
-        Me.NewGameToolStripMenuItem.Text = "New Game"
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NewGameToolStripMenuItem.Text = "&New Game"
         '
         'OptionsToolStripMenuItem
         '
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4
-        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
-        Me.OptionsToolStripMenuItem.Text = "Options"
+        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OptionsToolStripMenuItem.Text = "&Options"
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
-        Me.ExitToolStripMenuItem.Text = "Exit"
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckForUpdatesToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
-        Me.HelpToolStripMenuItem.Text = "Help"
+        Me.HelpToolStripMenuItem.Text = "&Help"
         '
         'CheckForUpdatesToolStripMenuItem
         '
         Me.CheckForUpdatesToolStripMenuItem.Name = "CheckForUpdatesToolStripMenuItem"
         Me.CheckForUpdatesToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
-        Me.CheckForUpdatesToolStripMenuItem.Text = "Check for Updates"
+        Me.CheckForUpdatesToolStripMenuItem.Text = "Check for &Updates"
         '
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
-        Me.AboutToolStripMenuItem.Text = "About Blitz"
+        Me.AboutToolStripMenuItem.Text = "&About Blitz"
         '
         'btnDrawCard
         '
@@ -141,7 +142,7 @@ Partial Class GameTable
         Me.lblPlayer1.ForeColor = System.Drawing.Color.White
         Me.lblPlayer1.Location = New System.Drawing.Point(533, 24)
         Me.lblPlayer1.Name = "lblPlayer1"
-        Me.lblPlayer1.Size = New System.Drawing.Size(52, 24)
+        Me.lblPlayer1.Size = New System.Drawing.Size(54, 26)
         Me.lblPlayer1.TabIndex = 3
         Me.lblPlayer1.Text = "Label1"
         '
@@ -152,7 +153,7 @@ Partial Class GameTable
         Me.lblPlayer2.ForeColor = System.Drawing.Color.White
         Me.lblPlayer2.Location = New System.Drawing.Point(533, 42)
         Me.lblPlayer2.Name = "lblPlayer2"
-        Me.lblPlayer2.Size = New System.Drawing.Size(52, 24)
+        Me.lblPlayer2.Size = New System.Drawing.Size(54, 26)
         Me.lblPlayer2.TabIndex = 4
         Me.lblPlayer2.Text = "Label2"
         '
@@ -163,7 +164,7 @@ Partial Class GameTable
         Me.lblPlayer3.ForeColor = System.Drawing.Color.White
         Me.lblPlayer3.Location = New System.Drawing.Point(532, 62)
         Me.lblPlayer3.Name = "lblPlayer3"
-        Me.lblPlayer3.Size = New System.Drawing.Size(52, 24)
+        Me.lblPlayer3.Size = New System.Drawing.Size(54, 26)
         Me.lblPlayer3.TabIndex = 5
         Me.lblPlayer3.Text = "Label3"
         '
@@ -174,7 +175,7 @@ Partial Class GameTable
         Me.lblPlayer4.ForeColor = System.Drawing.Color.White
         Me.lblPlayer4.Location = New System.Drawing.Point(532, 80)
         Me.lblPlayer4.Name = "lblPlayer4"
-        Me.lblPlayer4.Size = New System.Drawing.Size(52, 24)
+        Me.lblPlayer4.Size = New System.Drawing.Size(54, 26)
         Me.lblPlayer4.TabIndex = 6
         Me.lblPlayer4.Text = "Label4"
         '
@@ -294,12 +295,17 @@ Partial Class GameTable
         Me.btnNewRound.UseVisualStyleBackColor = True
         Me.btnNewRound.Visible = False
         '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
+        '
         'GameTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.ClientSize = New System.Drawing.Size(584, 608)
+        Me.ClientSize = New System.Drawing.Size(594, 616)
         Me.Controls.Add(Me.btnNewRound)
         Me.Controls.Add(Me.ScoreBox)
         Me.Controls.Add(Me.lblStatus)
@@ -352,5 +358,6 @@ Partial Class GameTable
     Friend WithEvents lblScoreName3 As System.Windows.Forms.Label
     Friend WithEvents btnNewRound As System.Windows.Forms.Button
     Friend WithEvents OptionsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
 
 End Class
