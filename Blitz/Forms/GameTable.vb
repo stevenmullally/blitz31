@@ -36,19 +36,6 @@ Public Class GameTable
         ' Add any initialization after the InitializeComponent() call.
         Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         Me.UpdateStyles()
-
-        ' Initialize card library
-        Try
-            If Not Card.Initialize() Then Exit Sub
-        Catch ex As Exception
-            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
-            Exit Sub
-        End Try
-
-        SetStatus("", 0, True)
-        UpdateScores(False)
-        CreatePlayers()
-        LoadSettings()
     End Sub
 
 #Region "Variable Declarations"
@@ -1164,13 +1151,25 @@ Public Class GameTable
         End SyncLock
     End Sub
 
+    Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        ' Initialize card library
+        Try
+            If Not Card.Initialize() Then Exit Sub
+        Catch ex As Exception
+            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            Exit Sub
+        End Try
+
+        SetStatus("", 0, True)
+        UpdateScores(False)
+        CreatePlayers()
+        LoadSettings()
+    End Sub
+
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
         ' Exit method if current objPlayer isn't a human
-        If Not GameActive Then Exit Sub
+        If Not GameActive Or Not RoundActive Then Exit Sub
         If Players(CurrentPlayer).Mode <> Modes.Human Then Exit Sub
-
-        ' If a game or round is not in play then ignore all clicks
-        If Not GameActive Or Not RoundActive Then Return
 
         Dim _x As Integer = e.X
         Dim _y As Integer = e.Y

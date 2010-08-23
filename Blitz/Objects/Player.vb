@@ -288,16 +288,6 @@ Namespace Objects
         End Function
 
         ''' <summary>
-        ''' Returns the face value of a card in the player's hand.
-        ''' </summary>
-        ''' <param name="value"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetCardFace(ByVal value As Byte) As Byte
-            Return _hand(value).FaceVal
-        End Function
-
-        ''' <summary>
         ''' Adds a card to the player's hand with the given position in the deck.
         ''' </summary>
         ''' <param name="value"></param>
