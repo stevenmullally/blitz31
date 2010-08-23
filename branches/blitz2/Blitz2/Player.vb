@@ -139,6 +139,29 @@ Namespace Objects
             TotalCards += 1
         End Sub
 
+        Public Sub RemoveCard(ByVal card As Byte)
+            Dim i As Byte
+
+            For i = 0 To UBound(Hand)
+                If Hand(i).Position = card Then
+                    Hand(i) = New Card(Nothing)
+                    TotalCards -= 1
+                    Exit For
+                End If
+            Next
+
+            If Hand(3).InUse Then
+                For i = 0 To 2
+                    If Not Hand(i).InUse Then
+                        Hand(i).Position = Hand(3).Position
+                        Hand(i).InUse = True
+
+                        Hand(3) = New Card(Nothing)
+                    End If
+                Next
+            End If
+        End Sub
+
         Private Function FreeCard() As Byte
             For FreeCard = 0 To UBound(Hand)
                 If Not Hand(FreeCard).InUse Then Return FreeCard

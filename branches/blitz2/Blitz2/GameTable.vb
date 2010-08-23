@@ -37,6 +37,7 @@ Public Class GameTable
     Private discardTop As Byte
     Private discardBottom As Byte
     Private discardCount As Byte
+    Private pickupCard As Byte
 
     Private cardOffsetX As Byte = 16
     Private cardOffsetY As Byte = 30
@@ -47,9 +48,12 @@ Public Class GameTable
     Private computerSync As New Object
     Private computerThread As Thread
 
+    Private DEBUG_MODE As Boolean
+
     Private Enum CardOwners
         Deck = 0
         Discard = 5
+        Used = 6
     End Enum
 #End Region
 
@@ -61,6 +65,10 @@ Public Class GameTable
         ' Add any initialization after the InitializeComponent() call.
         Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         Me.UpdateStyles()
+
+#If DEBUG Then
+        DEBUG_MODE = True
+#End If
     End Sub
 
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -71,16 +79,24 @@ Public Class GameTable
             Exit Sub
         End Try
 
-#If DEBUG Then
-        cardOffsetX = Card.CardWidth + 10
-        cardOffsetY = Card.CardHeight + 10
-#End If
+        If DEBUG_MODE Then
+            cardOffsetX = Card.CardWidth + 10
+            cardOffsetY = Card.CardHeight + 10
+        End If
 
         CreatePlayers()
     End Sub
 
     Private Sub GameTable_Closing() Handles Me.Closing
+        SyncLock computerSync
+            If takingTurn Then
+                Try
+                    computerThread.Abort()
+                Catch ex As Exception
 
+                End Try
+            End If
+        End SyncLock
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
@@ -102,7 +118,7 @@ Public Class GameTable
                 Case 2
                     With Player(2)
                         If .InGame Then
-                            If Not roundActive Then
+                            If DEBUG_MODE Or Not roundActive Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
                             Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
@@ -113,7 +129,7 @@ Public Class GameTable
                 Case 3
                     With Player(3)
                         If .InGame Then
-                            If Not roundActive Then
+                            If DEBUG_MODE Or Not roundActive Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
                             Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
@@ -124,7 +140,7 @@ Public Class GameTable
                 Case 4
                     With Player(4)
                         If .InGame Then
-                            If Not roundActive Then
+                            If DEBUG_MODE Or Not roundActive Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
                             Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
@@ -135,13 +151,51 @@ Public Class GameTable
             End Select
         Next
 
-        PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X, Player(CardOwners.Deck).HandLocation.Y), noCard, False)
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+        Dim n As Integer = 0
 
-        If discardTop <> noCard Then
-            PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X, Player(CardOwners.Discard).HandLocation.Y), discardTop, deck(discardTop).Invert)
+        If Not DeckEmpty() Then
+            Select Case CardsLeft()
+                Case Is > 35 : n = 7
+                Case Is > 30 : n = 6
+                Case Is > 25 : n = 5
+                Case Is > 20 : n = 4
+                Case Is > 15 : n = 3
+                Case Is > 10 : n = 2
+                Case Is > 5 : n = 1
+                Case Else : n = 0
+            End Select
+
+            For i = 0 To n
+                PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
+                x += 2 : y += 2
+            Next
         End If
 
-        Me.Refresh()
+        Select Case discardCount
+            Case Is > 35 : n = 7
+            Case Is > 30 : n = 6
+            Case Is > 25 : n = 5
+            Case Is > 20 : n = 4
+            Case Is > 15 : n = 3
+            Case Is > 10 : n = 2
+            Case Is > 5 : n = 1
+            Case Else : n = 0
+        End Select
+
+        If discardTop <> noCard Then
+            x = 0 : y = 0
+
+            If discardCount > 1 Then
+                For i = 0 To n
+                    PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
+                    x += 2 : y += 2
+                Next
+            End If
+
+            PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
+        End If
     End Sub
 #End Region
 
@@ -240,9 +294,31 @@ Public Class GameTable
                     End If
                 Loop
             Case CardOwners.Discard
+                pickupCard = card
+                deck(card).Owner = toPlayer
+                Player(toPlayer).AddCard(card)
 
+                discardTop = discardBottom
+
+                If discardTop <> noCard Then
+                    deck(discardTop).Owner = CardOwners.Discard
+                End If
+
+                discardCount -= 1
+                discardBottom = noCard
+                ResetInverts()
             Case Else
+                If discardTop <> noCard Then
+                    discardBottom = discardTop
+                    deck(discardBottom).Owner = CardOwners.Used
+                End If
 
+                discardTop = card
+                deck(card).Owner = CardOwners.Discard
+                discardCount += 1
+
+                Player(fromPlayer).RemoveCard(card)
+                ResetInverts()
         End Select
     End Sub
 
@@ -257,6 +333,34 @@ Public Class GameTable
         discardBottom = noCard
         discardCount = 0
     End Sub
+
+    Private Sub ResetInverts()
+        Dim i As Byte
+
+        For i = 0 To UBound(deck)
+            deck(i).Invert = False
+        Next
+    End Sub
+
+    Private Function CardsLeft() As Byte
+        Dim i As Byte
+
+        CardsLeft = 52
+
+        For i = 0 To UBound(deck)
+            If deck(i).Owner <> CardOwners.Deck Then CardsLeft -= 1
+        Next
+    End Function
+
+    Private Function DeckEmpty() As Boolean
+        Dim i As Byte
+
+        For i = 0 To UBound(deck)
+            If deck(i).Owner = CardOwners.Deck Then Return False
+        Next
+
+        Return True
+    End Function
 #End Region
 
 #Region "Player Methods"
@@ -301,6 +405,24 @@ Public Class GameTable
             .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth / 2), _
                                       .HandLocationMid.Y - (Card.CardHeight + cardOffsetY * (.TotalCards - 1)) / 2)
         End With
+    End Sub
+#End Region
+
+#Region "Delegates / Callbacks"
+    Private Delegate Sub SimpleCallback()
+
+    Private Sub DoRefreshScreen()
+        Me.Refresh()
+    End Sub
+
+    Private Sub RefreshScreen()
+        Dim cb As New simplecallback(AddressOf DoRefreshScreen)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+
+        End Try
     End Sub
 #End Region
 
