@@ -40,6 +40,7 @@ Public Class GameTable
     Private discardBottom As Byte
     Private discardCount As Byte
     Private pickupCard As Byte
+    Private deckTopLocation As Point
 
     Private cardOffsetX As Byte = 16
     Private cardOffsetY As Byte = 30
@@ -96,26 +97,41 @@ Public Class GameTable
         End SyncLock
     End Sub
 
-    Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
+    Private Sub GameTable_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDoubleClick
         If Not gameActive Or Not roundActive Then Exit Sub
-        If Player(currentPlayer).Mode <> Objects.Player.Modes.Human Then Exit Sub
 
-        Dim x As Integer = e.X
-        Dim y As Integer = e.Y
-        Dim card As Byte
-        Dim cardOwner As Byte = CardOwners.Deck
         Dim i As Byte
 
         For i = 0 To UBound(deck)
-            deck(i).Invert = False
+            If deck(i).Invert Then
+                MoveCard(deck(i).Owner, 1, i)
+                Me.Refresh()
+            End If
+        Next
+    End Sub
 
+    Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
+        If Not gameActive Or Not roundActive Then Exit Sub
+
+        Dim x As Integer = e.X
+        Dim y As Integer = e.Y
+        Dim card As Byte = noCard
+        Dim cardOwner As Byte = CardOwners.Deck
+        Dim validSelection As Boolean
+        Dim i As Byte
+
+        SetCardLocations()
+        ResetInverts()
+
+        For i = 0 To UBound(deck)
             If deck(i).Owner = 1 And Player(1).TotalCards = 4 Then
                 With Player(1).HandLocation
                     If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
-                       (y >= .Y) And (y <= (.Y + Objects.Card.CardWidth)) Then
+                       (y >= .Y) And (y <= (.Y + Objects.Card.CardHeight)) Then
 
                         card = i
                         cardOwner = 1
+                        validSelection = True
                     End If
                 End With
 
@@ -125,36 +141,31 @@ Public Class GameTable
             ElseIf deck(i).Owner = CardOwners.Discard Then
                 With Player(CardOwners.Discard).HandLocation
                     If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
-                       (y >= .Y) And (y <= (.Y + Objects.Card.CardWidth)) And _
+                       (y >= .Y) And (y <= (.Y + Objects.Card.CardHeight)) And _
                        Player(1).TotalCards < 4 Then
 
                         card = i
                         cardOwner = CardOwners.Discard
+                        validSelection = True
                     End If
                 End With
+            Else
+                If (x >= deckTopLocation.X) And (x <= (deckTopLocation.X + Objects.Card.CardWidth)) And _
+                   (y >= deckTopLocation.Y) And (y <= (deckTopLocation.Y + Objects.Card.CardHeight)) And _
+                    Player(1).TotalCards < 4 And Not DeckEmpty() Then
+
+                    card = FreeCard()
+                    validSelection = True
+                    Exit For
+                End If
             End If
         Next
 
-        If card <> noCard Then
+        If validSelection Then
+            If deck(card).Owner = CardOwners.Deck Then
+                Player(CardOwners.Deck).Flagged = True
+            End If
             deck(card).Invert = True
-
-            If cardOwner = 1 Then
-
-            ElseIf cardOwner = CardOwners.Discard Then
-
-            End If
-        Else
-            If Player(1).TotalCards < 4 Then
-                If knockactive Then
-
-                Else
-
-                End If
-            Else
-
-            End If
-
-            ResetInverts()
         End If
 
         Me.Refresh()
@@ -229,7 +240,12 @@ Public Class GameTable
             End Select
 
             For i = 0 To n
-                PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
+                If i = n Then
+                    PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, Player(CardOwners.Deck).Flagged)
+                Else
+                    PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
+                End If
+
                 x += 2 : y += 2
             Next
         End If
@@ -325,7 +341,7 @@ Public Class GameTable
 
             If Me.Player(player).InGame Then
                 MoveCard(CardOwners.Deck, player)
-                'Me.Refresh()
+                Me.Refresh()
             End If
 
             player += 1
@@ -370,7 +386,6 @@ Public Class GameTable
 
                 discardCount -= 1
                 discardBottom = noCard
-                ResetInverts()
             Case Else
                 If discardTop <> noCard Then
                     discardBottom = discardTop
@@ -382,8 +397,9 @@ Public Class GameTable
                 discardCount += 1
 
                 Player(fromPlayer).RemoveCard(card)
-                ResetInverts()
         End Select
+
+        ResetInverts()
     End Sub
 
     Private Sub ResetDeck()
@@ -404,6 +420,8 @@ Public Class GameTable
         For i = 0 To UBound(deck)
             deck(i).Invert = False
         Next
+
+        Player(CardOwners.Deck).Flagged = False
     End Sub
 
     Private Function CardsLeft() As Byte
@@ -424,6 +442,25 @@ Public Class GameTable
         Next
 
         Return True
+    End Function
+
+    Private Function FreeCard() As Byte
+        Dim rnd As New Random
+        Dim foundCard As Boolean
+        Dim card As Byte = noCard
+
+        FreeCard = noCard
+
+        Do Until foundCard
+            card = rnd.Next(0, 52)
+
+            If deck(card).Owner = CardOwners.Deck Then
+                FreeCard = card
+                foundCard = True
+            End If
+        Loop
+
+        Return FreeCard
     End Function
 #End Region
 
@@ -453,6 +490,30 @@ Public Class GameTable
     End Sub
 
     Private Sub SetCardLocations()
+        With Player(CardOwners.Deck)
+            Dim x As Integer = 0
+            Dim y As Integer = 0
+            Dim n As Integer = 0
+
+            If Not DeckEmpty() Then
+                Select Case CardsLeft()
+                    Case Is > 35 : n = 7
+                    Case Is > 30 : n = 6
+                    Case Is > 25 : n = 5
+                    Case Is > 20 : n = 4
+                    Case Is > 15 : n = 3
+                    Case Is > 10 : n = 2
+                    Case Is > 5 : n = 1
+                    Case Else : n = 0
+                End Select
+
+                For i = 0 To n
+                    x += 2 : y += 2
+                Next
+            End If
+
+            deckTopLocation = New Point(.HandLocation.X - x, .HandLocation.Y - y)
+        End With
         With Player(1)
             .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth + (cardOffsetX * (.TotalCards - 1))) / 2, _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
