@@ -80,6 +80,10 @@ Public Class GameTable
     Private TakingTurn As Boolean
     Private Delegate Sub SimpleCallback()
 
+    Private cardsDealt As Boolean
+    Private dealCardsSync As New Object
+    Private dealCardsThread As Thread
+
     Private Enum CardOwners
         Deck = 0
         Player1 = 1
@@ -161,7 +165,14 @@ Public Class GameTable
         RoundActive = True
 
         ' Deal cards to the players
-        DealCards()
+        SetStatus(Players(Dealer).Name & " is dealing cards", 0, True)
+
+        dealCardsThread = New Thread(AddressOf DealCards)
+        dealCardsThread.Start()
+    End Sub
+
+    Private Sub DoStartNewRound()
+        SetStatus("", 0, True)
 
         ' Check if anyone has blitz
         For i = 1 To 4
@@ -176,14 +187,23 @@ Public Class GameTable
             Cursor.Current = Cursors.Arrow
 
             ' Refresh screen to draw the cards
-            Me.Refresh()
+            RefreshScreen()
 
             ' Start the round
             TakeTurn()
         Else
             RoundOver()
         End If
+    End Sub
 
+    Private Sub StartNewRound()
+        Dim cb As New SimpleCallback(AddressOf DoStartNewRound)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub TakeTurn()
@@ -193,7 +213,7 @@ Public Class GameTable
         ' Reset pickup card to nothing
         PickupCard = NoCard
 
-        Me.Refresh()
+        RefreshScreen()
 
         ' End game if no more cards
         If DeckEmpty() Then
@@ -580,7 +600,7 @@ Public Class GameTable
 
         UpdateScores(True)
 
-        Me.Refresh()
+        RefreshScreen()
 
         Dim activePlayers As Byte = 0
 
@@ -726,17 +746,14 @@ Public Class GameTable
         Dim i As Byte
         Dim myPlayer As Byte = Dealer + 1
 
-        SetStatus(Players(Dealer).Name & " is dealing cards", 0, True)
-
         ' Deal cards to each player
         For i = 1 To 12
             If myPlayer > 4 Then myPlayer = 1
 
             If Players(myPlayer).InGame Then
                 MoveCard(CardOwners.Deck, myPlayer)
-                Me.Refresh()
-
-                System.Threading.Thread.Sleep(100)
+                RefreshScreen()
+                Thread.Sleep(100)
             End If
 
             myPlayer += 1
@@ -744,10 +761,11 @@ Public Class GameTable
 
         ' Setup discard pile
         MoveCard(CardOwners.Deck, CardOwners.Discard)
+        RefreshScreen()
         DiscardCount = 1
         DiscardBottom = NoCard
 
-        SetStatus("", 0, True)
+        StartNewRound()
     End Sub
 
     Private Sub ResetDeck()
@@ -762,6 +780,10 @@ Public Class GameTable
         DiscardTop = NoCard
         DiscardBottom = NoCard
         DiscardCount = 0
+
+        SyncLock dealCardsSync
+            cardsDealt = False
+        End SyncLock
     End Sub
 
     Private Sub ResetInverts()
@@ -1228,7 +1250,7 @@ Public Class GameTable
             ResetInverts()
         End If
 
-        Me.Refresh()
+        RefreshScreen()
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
@@ -1385,7 +1407,7 @@ Public Class GameTable
         End If
 
         ' Redraw cards
-        Me.Refresh()
+        RefreshScreen()
     End Sub
 
     Private Sub btnDiscard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDiscard.Click
@@ -1400,7 +1422,7 @@ Public Class GameTable
                 If Players(CurrentPlayer).TotalCards < 4 Then
                     MoveCard(CardOwners.Discard, CurrentPlayer, DiscardTop)
                     PlayerControls(False, True, False, True, "Select Card")
-                    Me.Refresh()
+                    RefreshScreen()
                 End If
             Case "Discard"
                 If InvertedCard() = PickupCard Then
@@ -1408,7 +1430,7 @@ Public Class GameTable
                 Else
                     MoveCard(CurrentPlayer, CardOwners.Discard, InvertedCard)
                     PlayerControls(True, True, False, True, "Knock")
-                    Me.Refresh()
+                    RefreshScreen()
                     TurnOver()
                 End If
         End Select
