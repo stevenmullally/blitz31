@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("Ryan Skeldon")> 
 <Assembly: AssemblyProduct("Blitz")> 
-<Assembly: AssemblyCopyright("Copyright (C) 2009-2010")> 
+<Assembly: AssemblyCopyright("GNU General Public License v2")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
