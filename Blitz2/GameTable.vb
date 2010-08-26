@@ -48,8 +48,12 @@ Public Class GameTable
     Private Const noCard As Byte = 52
 
     Private takingTurn As Boolean
-    Private computerSync As New Object
+    Private computerObj As New Object
     Private computerThread As Thread
+
+    Private dealingCards As Boolean
+    Private dealingObj As New Object
+    Private dealCardsThread As Thread
 
     Private DEBUG_MODE As Boolean
 
@@ -86,7 +90,7 @@ Public Class GameTable
     End Sub
 
     Private Sub GameTable_Closing() Handles Me.Closing
-        SyncLock computerSync
+        SyncLock computerObj
             If takingTurn Then
                 Try
                     computerThread.Abort()
@@ -100,18 +104,26 @@ Public Class GameTable
     Private Sub GameTable_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDoubleClick
         If Not gameActive Or Not roundActive Then Exit Sub
 
+        SyncLock dealingObj
+            If dealingCards Then Exit Sub
+        End SyncLock
+
         Dim i As Byte
 
         For i = 0 To UBound(deck)
             If deck(i).Invert Then
                 MoveCard(deck(i).Owner, 1, i)
-                Me.Refresh()
+                RefreshScreen()
             End If
         Next
     End Sub
 
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
         If Not gameActive Or Not roundActive Then Exit Sub
+
+        SyncLock dealingObj
+            If dealingCards Then Exit Sub
+        End SyncLock
 
         Dim x As Integer = e.X
         Dim y As Integer = e.Y
@@ -168,7 +180,7 @@ Public Class GameTable
             deck(card).Invert = True
         End If
 
-        Me.Refresh()
+        RefreshScreen()
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
@@ -282,7 +294,7 @@ Public Class GameTable
 
         Cursor.Current = Cursors.WaitCursor
 
-        SyncLock computerSync
+        SyncLock computerObj
             If takingTurn Then
                 Try
                     computerThread.Abort()
@@ -306,10 +318,10 @@ Public Class GameTable
         gameActive = True
         Cursor.Current = Cursors.Arrow
 
-        NewRound()
+        SetupNewRound()
     End Sub
 
-    Private Sub NewRound()
+    Private Sub SetupNewRound()
         Dim rnd As New Random
         Dim i As Byte
 
@@ -325,9 +337,33 @@ Public Class GameTable
         roundActive = True
 
         ResetDeck()
-        DealCards()
-        Me.Refresh()
+
+        SyncLock dealingObj
+            If dealingCards Then
+                Try
+                    dealCardsThread.Abort()
+                Catch ex As Exception
+
+                End Try
+            End If
+        End SyncLock
+
+        dealCardsThread = New Thread(AddressOf DealCards)
+        dealCardsThread.Start()
+    End Sub
+
+    Private Sub DoStartNewRound()
         Cursor.Current = Cursors.Arrow
+    End Sub
+
+    Private Sub StartNewRound()
+        Dim cb As New SimpleCallback(AddressOf DoStartNewRound)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+
+        End Try
     End Sub
 #End Region
 
@@ -336,23 +372,35 @@ Public Class GameTable
         Dim i As Byte
         Dim player As Byte = Me.dealer + 1
 
+        SyncLock dealingObj
+            dealingCards = True
+        End SyncLock
+
         For i = 1 To 12
             If player > 4 Then player = 1
 
             If Me.Player(player).InGame Then
                 MoveCard(CardOwners.Deck, player)
-                Me.Refresh()
+                RefreshScreen()
+                If Not DEBUG_MODE Then Thread.Sleep(100)
             End If
 
             player += 1
         Next
 
         MoveCard(CardOwners.Deck, CardOwners.Discard)
+        RefreshScreen()
         discardCount = 1
         discardBottom = noCard
+
+        SyncLock dealingObj
+            dealingCards = False
+        End SyncLock
+
+        StartNewRound()
     End Sub
 
-    Private Sub MoveCard(ByVal fromPlayer As Byte, ByVal toPlayer As Byte, Optional ByVal card As Byte = nocard)
+    Private Sub MoveCard(ByVal fromPlayer As Byte, ByVal toPlayer As Byte, Optional ByVal card As Byte = noCard)
         Select Case fromPlayer
             Case CardOwners.Deck
                 Dim cardFound As Boolean

@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("Blitz2")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyCompany("Ryan Skeldon")> 
 <Assembly: AssemblyProduct("Blitz2")> 
-<Assembly: AssemblyCopyright("Copyright ©  2010")> 
+<Assembly: AssemblyCopyright("GNU General Public License v2")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("2.0.0.0")> 
+<Assembly: AssemblyFileVersion("2.0.0.0")> 
