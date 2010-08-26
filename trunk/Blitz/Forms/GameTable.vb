@@ -80,7 +80,7 @@ Public Class GameTable
     Private TakingTurn As Boolean
     Private Delegate Sub SimpleCallback()
 
-    Private cardsDealt As Boolean
+    Private dealingCards As Boolean
     Private dealCardsSync As New Object
     Private dealCardsThread As Thread
 
@@ -166,6 +166,16 @@ Public Class GameTable
 
         ' Deal cards to the players
         SetStatus(Players(Dealer).Name & " is dealing cards", 0, True)
+
+        SyncLock dealCardsSync
+            If dealingCards Then
+                Try
+                    dealCardsThread.Abort()
+                Catch ex As Exception
+
+                End Try
+            End If
+        End SyncLock
 
         dealCardsThread = New Thread(AddressOf DealCards)
         dealCardsThread.Start()
@@ -746,6 +756,10 @@ Public Class GameTable
         Dim i As Byte
         Dim myPlayer As Byte = Dealer + 1
 
+        SyncLock dealCardsSync
+            dealingCards = True
+        End SyncLock
+
         ' Deal cards to each player
         For i = 1 To 12
             If myPlayer > 4 Then myPlayer = 1
@@ -765,6 +779,10 @@ Public Class GameTable
         DiscardCount = 1
         DiscardBottom = NoCard
 
+        SyncLock dealCardsSync
+            dealingCards = True
+        End SyncLock
+
         StartNewRound()
     End Sub
 
@@ -780,10 +798,6 @@ Public Class GameTable
         DiscardTop = NoCard
         DiscardBottom = NoCard
         DiscardCount = 0
-
-        SyncLock dealCardsSync
-            cardsDealt = False
-        End SyncLock
     End Sub
 
     Private Sub ResetInverts()
