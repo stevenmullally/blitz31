@@ -18,13 +18,14 @@ Option Explicit On
 Imports System.Threading
 Imports Blitz2.Objects
 Imports Blitz2.Objects.Card
+Imports Blitz2.Objects.Player
 
 Public Class GameTable
 #Region "Game Fields"
     Private deck(51) As Card
     Public Player(5) As Player
 
-    Private seed As Integer
+    Private seed As Integer = -1
 
     Private gameActive As Boolean
     Private roundActive As Boolean
@@ -82,6 +83,7 @@ Public Class GameTable
     End Sub
 
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        ' Initialize card library.
         Try
             If Not Card.Initialize Then Exit Sub
         Catch ex As Exception
@@ -94,10 +96,21 @@ Public Class GameTable
     End Sub
 
     Private Sub GameTable_Closing() Handles Me.Closing
+        ' Abort any running threads.
         SyncLock computerObj
             If takingTurn Then
                 Try
                     computerThread.Abort()
+                Catch ex As Exception
+
+                End Try
+            End If
+        End SyncLock
+
+        SyncLock dealingObj
+            If dealingCards Then
+                Try
+                    dealCardsThread.Abort()
                 Catch ex As Exception
 
                 End Try
@@ -108,16 +121,29 @@ Public Class GameTable
     Private Sub GameTable_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDoubleClick
         If Not gameActive Or Not roundActive Then Exit Sub
 
+        ' Check if cards are being dealt.
         SyncLock dealingObj
             If dealingCards Then Exit Sub
         End SyncLock
 
         Dim i As Byte
 
+        ' Find the inverted card and move it.
         For i = 0 To UBound(deck)
             If deck(i).Invert Then
-                MoveCard(deck(i).Owner, 1, i)
-                RefreshScreen()
+                Select Case deck(i).Owner
+                    Case 1
+                        If pickupCard = i Then
+                            MsgBox("You cannot discard the card you just picked up from the discard pile.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Illegal Move")
+                        Else
+                            MoveCard(1, CardOwners.Discard, i)
+                            RefreshScreen()
+                            TurnOver()
+                        End If
+                    Case CardOwners.Deck, CardOwners.Discard
+                        MoveCard(deck(i).Owner, 1, i)
+                        RefreshScreen()
+                End Select
             End If
         Next
     End Sub
@@ -125,6 +151,7 @@ Public Class GameTable
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
         If Not gameActive Or Not roundActive Then Exit Sub
 
+        ' Check if cards are being dealt.
         SyncLock dealingObj
             If dealingCards Then Exit Sub
         End SyncLock
@@ -139,6 +166,7 @@ Public Class GameTable
         SetCardLocations()
         ResetInverts()
 
+        ' Check if a valid card was selected.
         For i = 0 To UBound(deck)
             If deck(i).Owner = 1 And Player(1).TotalCards = 4 Then
                 With Player(1).HandLocation
@@ -177,6 +205,7 @@ Public Class GameTable
             End If
         Next
 
+        ' Flag the card if it was a valid selection.
         If validSelection Then
             If deck(card).Owner = CardOwners.Deck Then
                 Player(CardOwners.Deck).Flagged = True
@@ -188,21 +217,30 @@ Public Class GameTable
     End Sub
 
     Private Sub GameTable_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        ' Update height/width fields to new form size.
         screenHeight = Me.Size.Height
         screenWidth = Me.Size.Width
 
+        ' Update the card locations with the new parameters.
         If gameActive Then
             UpdateHandLocations()
         End If
+
         RefreshScreen()
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
         If Not gameActive Then Exit Sub
 
-        Dim i As Byte
-
         SetCardLocations()
+
+        DrawCards(e)
+        DrawDeck(e)
+        DrawDiscard(e)
+    End Sub
+
+    Private Sub DrawCards(ByVal e As PaintEventArgs)
+        Dim i As Byte
 
         For i = 0 To UBound(deck)
             Select Case deck(i).Owner
@@ -221,7 +259,7 @@ Public Class GameTable
                             Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
                             End If
-                            .HandLocation = New Point(.HandLocation.X, .HandLocation.Y + cardOffsetY)
+                            .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
                     End With
                 Case 3
@@ -243,16 +281,19 @@ Public Class GameTable
                             Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
                             End If
-                            .HandLocation = New Point(.HandLocation.X, .HandLocation.Y + cardOffsetY)
+                            .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
                     End With
             End Select
         Next
+    End Sub
 
+    Private Sub DrawDeck(ByVal e As PaintEventArgs)
         Dim x As Integer = 0
         Dim y As Integer = 0
         Dim n As Integer = 0
 
+        ' Draw the deck pile.
         If Not DeckEmpty() Then
             Select Case CardsLeft()
                 Case Is > 35 : n = 7
@@ -275,7 +316,14 @@ Public Class GameTable
                 x += 1 : y += 1
             Next
         End If
-        
+    End Sub
+
+    Private Sub DrawDiscard(ByVal e As PaintEventArgs)
+        Dim x As Integer = 0
+        Dim y As Integer = 0
+        Dim n As Integer = 0
+
+        ' Draw the discard pile.
         Select Case discardCount
             Case Is > 35 : n = 7
             Case Is > 30 : n = 6
@@ -308,6 +356,7 @@ Public Class GameTable
 
         Cursor.Current = Cursors.WaitCursor
 
+        ' Abort any running threads.
         SyncLock computerObj
             If takingTurn Then
                 Try
@@ -317,42 +366,6 @@ Public Class GameTable
                 End Try
             End If
         End SyncLock
-
-        gameActive = False
-        roundActive = False
-
-        For i = 1 To 4
-            Me.Player(i).Tokens = 4
-            Me.Player(i).InGame = True
-        Next
-
-        UpdateHandLocations()
-
-        dealer = 4
-        currentPlayer = 1
-
-        gameActive = True
-        Cursor.Current = Cursors.Arrow
-
-        SetupNewRound()
-    End Sub
-
-    Private Sub SetupNewRound()
-        Dim rnd As New Random
-        Dim i As Byte
-
-        Cursor.Current = Cursors.WaitCursor
-
-        seed = rnd.Next(0, 65535)
-
-        For i = 0 To 4
-            Player(i).CreateNewHand()
-            Player(i).Flagged = False
-        Next
-
-        roundActive = True
-
-        ResetDeck()
 
         SyncLock dealingObj
             If dealingCards Then
@@ -364,16 +377,156 @@ Public Class GameTable
             End If
         End SyncLock
 
+        ' Reset game/round status.
+        gameActive = False
+        roundActive = False
+
+        ' Reset player scores.
+        For i = 1 To 4
+            Me.Player(i).Tokens = 4
+            Me.Player(i).InGame = True
+        Next
+
+        dealer = 4
+        currentPlayer = 1
+
+        UpdateHandLocations()
+
+        gameActive = True
+
+        Cursor.Current = Cursors.Arrow
+
+        SetupNewRound()
+    End Sub
+
+    Private Sub SetupNewRound()
+        Dim rnd As New Random
+        Dim i As Byte
+
+        Cursor.Current = Cursors.WaitCursor
+
+        ' Get the seed for the current round.
+        seed = rnd.Next(0, 65535)
+
+        ' Reset player hands.
+        For i = 0 To 4
+            Player(i).CreateNewHand()
+            Player(i).Flagged = False
+        Next
+
+        roundActive = True
+
+        ResetDeck()
+
+        ' Deal the cards.
         dealCardsThread = New Thread(AddressOf DealCards)
         dealCardsThread.Start()
     End Sub
 
     Private Sub DoStartNewRound()
+        Dim i As Byte
+
+        Cursor.Current = Cursors.WaitCursor
+
+        For i = 1 To 4
+            If HasBlitz(i) And roundActive Then
+                blitzActive = True
+                roundActive = False
+            End If
+        Next
+
+        If roundActive Then
+            Cursor.Current = Cursors.Arrow
+
+            RefreshScreen()
+
+            TakeTurn()
+        Else
+            RoundOver()
+        End If
+
         Cursor.Current = Cursors.Arrow
     End Sub
 
     Private Sub StartNewRound()
         Dim cb As New SimpleCallback(AddressOf DoStartNewRound)
+
+        Try
+            Me.Invoke(cb)
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub RoundOver()
+
+    End Sub
+
+    Private Sub TakeTurn()
+        Cursor.Current = Cursors.WaitCursor
+
+        pickupCard = noCard
+
+        RefreshScreen()
+
+        If DeckEmpty() Then
+            RoundOver()
+        Else
+            If Me.Player(currentPlayer).InGame Then
+                If knockActive And currentPlayer = knocker Then
+                    RoundOver()
+                Else
+                    ' Show text under current player showing their turn.
+                    Select Case currentPlayer
+                        Case 1
+                            ' You're turn!
+                        Case 2, 3, 4
+                            ' Player X's turn.
+                    End Select
+
+                    Select Case Me.Player(currentPlayer).Mode
+                        Case Modes.Human
+                            If knockActive Then
+                                ' Disable ability to knock.
+                            Else
+                                ' Enable ability to knock.
+                            End If
+                        Case Modes.Computer
+                            ' Disable UI.
+
+                            computerThread = New Thread(AddressOf ComputerTurn)
+                            computerThread.Start()
+                    End Select
+                End If
+            Else
+                TurnOver()
+            End If
+        End If
+
+        Cursor.Current = Cursors.Arrow
+    End Sub
+
+    Private Sub DoTurnOver()
+        If knockActive And knocker = currentPlayer Then
+            ' Show that the player knocked
+        End If
+
+        If HasBlitz(currentPlayer) And roundActive Then
+            blitzActive = True
+            roundActive = False
+        End If
+
+        If DeckEmpty() Or Not roundActive Then
+            RoundOver()
+        Else
+            currentPlayer += 1
+            If currentPlayer > 4 Then currentPlayer = 1
+            TakeTurn()
+        End If
+    End Sub
+
+    Private Sub TurnOver()
+        Dim cb As New SimpleCallback(AddressOf DoTurnOver)
 
         Try
             Me.Invoke(cb)
@@ -533,10 +686,10 @@ Public Class GameTable
         Dim i As Byte
 
         For i = 0 To UBound(Me.Player)
-            Me.Player(i) = New Player(Objects.Player.Modes.Computer)
+            Me.Player(i) = New Player(Modes.Computer)
         Next
 
-        Me.Player(1).Mode = Objects.Player.Modes.Human
+        Me.Player(1).Mode = Modes.Human
 
         With Me
             .Player(1).Name = "Player 1"
@@ -578,16 +731,16 @@ Public Class GameTable
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
         With Player(2)
-            .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth / 2), _
-                                      .HandLocationMid.Y - (Card.CardHeight + cardOffsetY * (.TotalCards - 1)) / 2)
+            .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth + (cardOffsetX * (.TotalCards - 1))) / 2, _
+                                      .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
         With Player(3)
             .HandLocation = New Point(.HandLocationMid.X - ((Card.CardWidth + cardOffsetX * (.TotalCards - 1)) / 2), _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
         With Player(4)
-            .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth / 2), _
-                                      .HandLocationMid.Y - (Card.CardHeight + cardOffsetY * (.TotalCards - 1)) / 2)
+            .HandLocation = New Point(.HandLocationMid.X - ((Card.CardWidth + cardOffsetX * (.TotalCards - 1)) / 2), _
+                                      .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
     End Sub
 
@@ -599,6 +752,97 @@ Public Class GameTable
         Player(3).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) - 200)
         Player(4).HandLocationMid = New Point((screenWidth / 2) + 200, (screenHeight / 2))
     End Sub
+
+    Private Function HasBlitz(ByVal player As Byte) As Boolean
+        If PlayerScore(player) = 31 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Function PlayerScore(ByVal player As Byte) As Byte
+        Dim masterSuit As Byte = GetMasterSuit(player)
+        Dim score As Byte
+        Dim i As Byte
+
+        With Me.Player(player)
+            For i = 0 To 2
+                If .Hand(i).Suit = masterSuit Then
+                    score += .Hand(i).Value
+                End If
+            Next
+        End With
+
+        Return score
+    End Function
+
+    Private Function GetMasterSuit(ByVal player As Byte) As Byte
+        Dim masterSuit As Byte
+        Dim highestCard As Byte
+        Dim suits(3) As Byte
+        Dim sumA As Byte = 0
+        Dim sumB As Byte = 0
+        Dim i As Byte
+
+        With Me.Player(player)
+            For i = 0 To 2
+                suits(.Hand(i).Suit) += 1
+                .Hand(i).Flagged = False
+            Next
+
+            For i = 0 To 3
+                If suits(i) > suits(masterSuit) Then masterSuit = i
+            Next
+
+            Select Case suits(masterSuit)
+                Case 1
+                    For i = 0 To 2
+                        If .Hand(i).Value > .Hand(highestCard).Value Then highestCard = i
+                    Next
+                    masterSuit = .Hand(highestCard).Suit
+                    .Hand(highestCard).Flagged = True
+                Case 2
+                    For i = 0 To 2
+                        If .Hand(i).Suit = masterSuit Then
+                            .Hand(i).Flagged = True
+                            sumA += .Hand(i).Value
+                        Else
+                            sumB += .Hand(i).Value
+                        End If
+                    Next
+
+                    For i = 0 To 2
+                        If sumA > sumB Then
+                            If .Hand(i).Flagged Then masterSuit = .Hand(i).Suit
+                        Else
+                            If Not .Hand(i).Flagged Then masterSuit = .Hand(i).Suit
+                        End If
+                    Next
+                Case 3
+                    For i = 0 To 2
+                        .Hand(i).Flagged = True
+                    Next
+                    masterSuit = .Hand(0).Suit
+            End Select
+
+            Return masterSuit
+        End With
+    End Function
+
+    Private Sub ComputerTurn()
+        SyncLock computerObj
+            takingTurn = True
+        End SyncLock
+
+        RefreshScreen()
+
+        SyncLock computerObj
+            takingTurn = False
+        End SyncLock
+
+        TurnOver()
+    End Sub
 #End Region
 
 #Region "Delegates / Callbacks"
@@ -609,7 +853,7 @@ Public Class GameTable
     End Sub
 
     Private Sub RefreshScreen()
-        Dim cb As New simplecallback(AddressOf DoRefreshScreen)
+        Dim cb As New SimpleCallback(AddressOf DoRefreshScreen)
 
         Try
             Me.Invoke(cb)
