@@ -45,6 +45,9 @@ Public Class GameTable
     Private cardOffsetX As Byte = 16
     Private cardOffsetY As Byte = 30
 
+    Private screenWidth As Integer
+    Private screenHeight As Integer
+
     Private Const noCard As Byte = 52
 
     Private takingTurn As Boolean
@@ -82,7 +85,8 @@ Public Class GameTable
         Try
             If Not Card.Initialize Then Exit Sub
         Catch ex As Exception
-            MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            MsgBox("Unable to initialize cards library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            Me.Close()
             Exit Sub
         End Try
 
@@ -183,10 +187,20 @@ Public Class GameTable
         RefreshScreen()
     End Sub
 
-    Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
-        Dim i As Byte
+    Private Sub GameTable_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        screenHeight = Me.Size.Height
+        screenWidth = Me.Size.Width
 
+        If gameActive Then
+            UpdateHandLocations()
+        End If
+        RefreshScreen()
+    End Sub
+
+    Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
         If Not gameActive Then Exit Sub
+
+        Dim i As Byte
 
         SetCardLocations()
 
@@ -258,10 +272,10 @@ Public Class GameTable
                     PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
                 End If
 
-                x += 2 : y += 2
+                x += 1 : y += 1
             Next
         End If
-
+        
         Select Case discardCount
             Case Is > 35 : n = 7
             Case Is > 30 : n = 6
@@ -278,8 +292,8 @@ Public Class GameTable
 
             If discardCount > 1 Then
                 For i = 0 To n
-                    PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
-                    x += 2 : y += 2
+                    PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, False)
+                    x += 1 : y += 1
                 Next
             End If
 
@@ -311,6 +325,8 @@ Public Class GameTable
             Me.Player(i).Tokens = 4
             Me.Player(i).InGame = True
         Next
+
+        UpdateHandLocations()
 
         dealer = 4
         currentPlayer = 1
@@ -528,12 +544,7 @@ Public Class GameTable
             .Player(3).Name = "Player 3"
             .Player(4).Name = "Player 4"
 
-            .Player(CardOwners.Deck).HandLocation = New Point((290 - Card.CardWidth), (300 - (Card.CardHeight / 2)))
-            .Player(CardOwners.Discard).HandLocation = New Point(310, (300 - (Card.CardHeight / 2)))
-            .Player(1).HandLocationMid = New Point(300, 500)
-            .Player(2).HandLocationMid = New Point(100, 300)
-            .Player(3).HandLocationMid = New Point(300, 100)
-            .Player(4).HandLocationMid = New Point(500, 300)
+            UpdateHandLocations()
         End With
     End Sub
 
@@ -579,6 +590,15 @@ Public Class GameTable
                                       .HandLocationMid.Y - (Card.CardHeight + cardOffsetY * (.TotalCards - 1)) / 2)
         End With
     End Sub
+
+    Private Sub UpdateHandLocations()
+        Player(CardOwners.Deck).HandLocation = New Point(((screenWidth / 2) - 10 - Card.CardWidth), ((screenHeight / 2) - (Card.CardHeight / 2)))
+        Player(CardOwners.Discard).HandLocation = New Point((screenWidth / 2) + 10, ((screenHeight / 2) - (Card.CardHeight / 2)))
+        Player(1).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) + 200)
+        Player(2).HandLocationMid = New Point((screenWidth / 2) - 200, (screenHeight / 2))
+        Player(3).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) - 200)
+        Player(4).HandLocationMid = New Point((screenWidth / 2) + 200, (screenHeight / 2))
+    End Sub
 #End Region
 
 #Region "Delegates / Callbacks"
@@ -608,5 +628,4 @@ Public Class GameTable
         Me.Close()
     End Sub
 #End Region
-
 End Class

@@ -37,7 +37,7 @@ Partial Class GameTable
         Me.MainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow
         Me.MainMenu.Location = New System.Drawing.Point(0, 0)
         Me.MainMenu.Name = "MainMenu"
-        Me.MainMenu.Size = New System.Drawing.Size(594, 24)
+        Me.MainMenu.Size = New System.Drawing.Size(601, 24)
         Me.MainMenu.TabIndex = 0
         Me.MainMenu.Text = "MainMenu"
         '
@@ -78,7 +78,7 @@ Partial Class GameTable
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.ClientSize = New System.Drawing.Size(594, 596)
+        Me.ClientSize = New System.Drawing.Size(601, 601)
         Me.Controls.Add(Me.MainMenu)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MainMenuStrip = Me.MainMenu
