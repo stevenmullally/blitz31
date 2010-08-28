@@ -160,19 +160,19 @@ Namespace Objects
         End Function
 
         Private Function FaceValue() As Byte
-            Return (Position - SuitVal()) / 4
+            Return (Position - Suit()) / 4
         End Function
 
-        Public Function SuitVal() As Byte
+        Public Function Suit() As Byte
             Select Case Position
                 Case 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48
-                    SuitVal = Suits.Clubs
+                    Suit = Suits.Clubs
                 Case 1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49
-                    SuitVal = Suits.Diamonds
+                    Suit = Suits.Diamonds
                 Case 2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50
-                    SuitVal = Suits.Hearts
+                    Suit = Suits.Hearts
                 Case 3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51
-                    SuitVal = Suits.Spades
+                    Suit = Suits.Spades
             End Select
         End Function
 #End Region

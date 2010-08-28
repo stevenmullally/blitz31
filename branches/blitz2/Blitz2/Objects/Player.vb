@@ -21,6 +21,12 @@ Namespace Objects
 
 #Region "Fields"
         Private _name As String
+        ''' <summary>
+        ''' Gets or sets the Player's name.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's name.</returns>
+        ''' <remarks></remarks>
         Public Property Name() As String
             Get
                 Return _name
@@ -31,6 +37,12 @@ Namespace Objects
         End Property
 
         Private _mode As Modes
+        ''' <summary>
+        ''' Gets or sets the Player's mode.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's mode.</returns>
+        ''' <remarks></remarks>
         Public Property Mode() As Modes
             Get
                 Return _mode
@@ -41,6 +53,12 @@ Namespace Objects
         End Property
 
         Private _hand(3) As Card
+        ''' <summary>
+        ''' The Player's array of cards.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>A Player's card.</returns>
+        ''' <remarks></remarks>
         Public Property Hand() As Card()
             Get
                 Return _hand
@@ -51,6 +69,12 @@ Namespace Objects
         End Property
 
         Private _handLocation As Point
+        ''' <summary>
+        ''' Gets or sets the location of the Player's hand.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The location of the Player's hands.</returns>
+        ''' <remarks></remarks>
         Public Property HandLocation() As Point
             Get
                 Return _handLocation
@@ -61,6 +85,12 @@ Namespace Objects
         End Property
 
         Private _handLocationMid As Point
+        ''' <summary>
+        ''' Gets or sets the middle of the Player's hand.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The middle of the Player's hand.</returns>
+        ''' <remarks></remarks>
         Public Property HandLocationMid() As Point
             Get
                 Return _handLocationMid
@@ -71,6 +101,12 @@ Namespace Objects
         End Property
 
         Private _totalCards As Byte
+        ''' <summary>
+        ''' Gets or sets the Player's total cards.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's total cards.</returns>
+        ''' <remarks></remarks>
         Public Property TotalCards()
             Get
                 Return _totalCards
@@ -81,6 +117,12 @@ Namespace Objects
         End Property
 
         Private _tokens As Byte
+        ''' <summary>
+        ''' Gets or sets the Player's token count.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's token count.</returns>
+        ''' <remarks></remarks>
         Public Property Tokens() As Byte
             Get
                 Return _tokens
@@ -91,6 +133,12 @@ Namespace Objects
         End Property
 
         Private _inGame As Boolean
+        ''' <summary>
+        ''' Gets or sets the Player's game status.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's game status.</returns>
+        ''' <remarks></remarks>
         Public Property InGame() As Boolean
             Get
                 Return _inGame
@@ -101,6 +149,12 @@ Namespace Objects
         End Property
 
         Private _flagged As Boolean
+        ''' <summary>
+        ''' Gets or sets the Player's flag.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns>The Player's flag.</returns>
+        ''' <remarks></remarks>
         Public Property Flagged() As Boolean
             Get
                 Return _flagged
@@ -117,12 +171,21 @@ Namespace Objects
 #End Region
 
 #Region "Methods"
+        ''' <summary>
+        ''' Creates a new player.
+        ''' </summary>
+        ''' <param name="mode">The Player's mode.</param>
+        ''' <remarks></remarks>
         Public Sub New(ByVal mode As Modes)
             Me.Mode = mode
 
             CreateNewHand()
         End Sub
 
+        ''' <summary>
+        ''' Creates a new hand for the Player.
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Sub CreateNewHand()
             For i As Byte = 0 To 3
                 Hand(i) = New Card(Nothing)
@@ -131,6 +194,11 @@ Namespace Objects
             TotalCards = 0
         End Sub
 
+        ''' <summary>
+        ''' Adds a card to the Player's hand.
+        ''' </summary>
+        ''' <param name="card">Position of the card in the deck to add.</param>
+        ''' <remarks></remarks>
         Public Sub AddCard(ByVal card As Byte)
             If TotalCards = 4 Then Exit Sub
 
@@ -139,6 +207,11 @@ Namespace Objects
             TotalCards += 1
         End Sub
 
+        ''' <summary>
+        ''' Removes a card from the Player's hand.
+        ''' </summary>
+        ''' <param name="card">Position of the card in the deck to remove.</param>
+        ''' <remarks></remarks>
         Public Sub RemoveCard(ByVal card As Byte)
             Dim i As Byte
 
@@ -162,6 +235,11 @@ Namespace Objects
             End If
         End Sub
 
+        ''' <summary>
+        ''' Finds the next free card in the Player's hand.
+        ''' </summary>
+        ''' <returns>The next free card in the Player's hand.</returns>
+        ''' <remarks></remarks>
         Private Function FreeCard() As Byte
             For FreeCard = 0 To UBound(Hand)
                 If Not Hand(FreeCard).InUse Then Return FreeCard
