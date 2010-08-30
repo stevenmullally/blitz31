@@ -156,6 +156,10 @@ Public Class GameTable
             If dealingCards Then Exit Sub
         End SyncLock
 
+        SyncLock computerObj
+            If takingTurn Then Exit Sub
+        End SyncLock
+
         Dim x As Integer = e.X
         Dim y As Integer = e.Y
         Dim card As Byte = noCard
@@ -233,12 +237,13 @@ Public Class GameTable
         If Not gameActive Then Exit Sub
 
         SetCardLocations()
-
         DrawCards(e)
         DrawDeck(e)
         DrawDiscard(e)
     End Sub
+#End Region
 
+#Region "Graphic Methods"
     Private Sub DrawCards(ByVal e As PaintEventArgs)
         Dim i As Byte
 
@@ -389,13 +394,9 @@ Public Class GameTable
 
         dealer = 4
         currentPlayer = 1
-
         UpdateHandLocations()
-
         gameActive = True
-
         Cursor.Current = Cursors.Arrow
-
         SetupNewRound()
     End Sub
 
@@ -404,9 +405,9 @@ Public Class GameTable
         Dim i As Byte
 
         Cursor.Current = Cursors.WaitCursor
-
-        ' Get the seed for the current round.
-        seed = rnd.Next(0, 65535)
+        knockActive = False
+        blitzActive = False
+        knocker = Nothing
 
         ' Reset player hands.
         For i = 0 To 4
@@ -415,6 +416,10 @@ Public Class GameTable
         Next
 
         roundActive = True
+
+        ' Get the seed for the current round.
+        seed = rnd.Next(0, 65535)
+        Me.Text = seed.ToString
 
         ResetDeck()
 
@@ -437,9 +442,7 @@ Public Class GameTable
 
         If roundActive Then
             Cursor.Current = Cursors.Arrow
-
             RefreshScreen()
-
             TakeTurn()
         Else
             RoundOver()
@@ -459,14 +462,12 @@ Public Class GameTable
     End Sub
 
     Private Sub RoundOver()
-
+        roundActive = False
     End Sub
 
     Private Sub TakeTurn()
         Cursor.Current = Cursors.WaitCursor
-
         pickupCard = noCard
-
         RefreshScreen()
 
         If DeckEmpty() Then
@@ -831,9 +832,284 @@ Public Class GameTable
     End Function
 
     Private Sub ComputerTurn()
+        Dim masterSuit As Byte = GetMasterSuit(currentPlayer)
+        Dim suits(3) As Byte
+        Dim highestCard As Byte
+        Dim lowestCard As Byte
+        Dim cardToTake As Byte = noCard
+        Dim cardToRemove As Byte = noCard
+        Dim sumA As Byte
+        Dim sumB As Byte
+        Dim cardA As Byte = noCard
+        Dim cardB As Byte = noCard
+        Dim oddCard As Byte = noCard
+        Dim hasAce As Boolean
+        Dim i As Byte
+        Dim sleepTime As Byte = 0
+
         SyncLock computerObj
             takingTurn = True
         End SyncLock
+
+        If Not knockActive Then
+            If deck(discardTop).Suit <> masterSuit Then
+                Dim goal As Byte
+
+                If CardsLeft() >= 20 Then
+                    goal = 25
+                Else
+                    goal = 29
+                End If
+
+                If PlayerScore(currentPlayer) > goal Then
+                    knocker = currentPlayer
+                    knockActive = True
+                    Debug.WriteLine("Player " & currentPlayer.ToString & " knocked.")
+                End If
+            End If
+        End If
+
+        If Not knockActive Or (knockActive And knocker <> currentPlayer) Then
+            With Me.Player(currentPlayer)
+                For i = 0 To 2
+                    suits(.Hand(i).Suit) += 1
+                Next
+
+                sumA = 0 : sumB = 0
+
+                For i = 0 To 2
+                    If .Hand(i).Suit = masterSuit Then
+                        .Hand(i).Flagged = True
+                    Else
+                        .Hand(i).Flagged = False
+                    End If
+                Next
+
+                Thread.Sleep(sleepTime * 1000)
+
+                If deck(discardTop).Suit = masterSuit Then
+                    sumA += deck(discardTop).Value
+
+                    Select Case suits(masterSuit)
+                        Case 1
+                            For i = 0 To 2
+                                If .Hand(i).Flagged Then
+                                    sumA += .Hand(i).Value
+                                Else
+                                    If cardA = noCard Then
+                                        cardA = i
+                                    Else
+                                        cardB = i
+                                    End If
+                                End If
+                            Next
+
+                            If cardA > cardB Then
+                                highestCard = cardA
+                            Else
+                                highestCard = cardB
+                            End If
+
+                            sumB = .Hand(highestCard).Value
+
+                            If sumA > sumB Then
+                                cardToTake = discardTop
+                            End If
+                        Case 2
+                            For i = 0 To 2
+                                If .Hand(i).Flagged Then
+                                    sumA += .Hand(i).Value
+                                Else
+                                    sumB += .Hand(i).Value
+                                End If
+                            Next
+
+                            If sumA > sumB Then
+                                cardToTake = discardTop
+                            End If
+                        Case 3
+                            lowestCard = 0
+
+                            For i = 0 To 2
+                                If .Hand(i).Value < .Hand(lowestCard).Value Then lowestCard = i
+                            Next
+
+                            If .Hand(lowestCard).Value < deck(discardTop).Value Then cardToTake = discardTop
+                    End Select
+                Else
+                    Select Case suits(masterSuit)
+                        Case 1
+                            highestCard = 0
+                            For i = 0 To 2
+                                If .Hand(i).Value > .Hand(highestCard).Value Then highestCard = i
+                            Next i
+
+                            sumA = .Hand(highestCard).Value : sumB = 0
+
+                            For i = 0 To 2
+                                If .Hand(i).Suit = deck(discardTop).Suit Then
+                                    sumB = .Hand(i).Value + deck(discardTop).Value
+                                Else
+                                    If .Hand(i).Value > sumB Then
+                                        sumB = .Hand(i).Value
+                                    End If
+                                End If
+                            Next i
+
+                            If sumA < sumB Then
+                                cardToTake = discardTop
+                            End If
+                        Case 2
+                            For i = 0 To 2
+                                If .Hand(i).Flagged Then
+                                    sumA += .Hand(i).Value
+                                    If .Hand(i).Value = 11 Then hasAce = True
+                                Else
+                                    sumB = .Hand(i).Value
+                                    oddCard = i
+                                End If
+                            Next i
+
+                            If .Hand(oddCard).Suit = deck(discardTop).Suit Then
+                                sumB += deck(discardTop).Value
+                            End If
+
+                            If sumA < sumB Then
+                                cardToTake = discardTop
+                            Else
+                                If deck(discardTop).Value = 11 Then
+                                    If Not hasAce Then
+                                        cardToTake = discardTop
+                                    End If
+                                End If
+                            End If
+                        Case 3
+                            For i = 0 To 2
+                                sumA += .Hand(i).Value
+                            Next i
+
+                            If sumA < deck(discardTop).Value Then
+                                cardToTake = discardTop
+                            End If
+                    End Select
+                End If
+
+                If cardToTake = noCard Then
+                    MoveCard(CardOwners.Deck, currentPlayer)
+                Else
+                    MoveCard(CardOwners.Discard, currentPlayer, cardToTake)
+                End If
+
+                RefreshScreen()
+                Thread.Sleep(sleepTime * 1000)
+                sumA = 0 : sumB = 0
+
+                For i = 0 To 3
+                    suits(i) = 0
+                    .Hand(i).Flagged = False
+                Next
+
+                For i = 0 To 3
+                    suits(.Hand(i).Suit) += 1
+                Next
+
+                masterSuit = 0
+                For i = 0 To 3
+                    If suits(i) > suits(masterSuit) Then masterSuit = i
+                Next
+
+                For i = 0 To 3
+                    If .Hand(i).Suit = masterSuit Then
+                        sumA += .Hand(i).Value
+                        .Hand(i).Flagged = True
+                    End If
+                Next
+
+                Select Case suits(masterSuit)
+                    Case 1
+                        lowestCard = 0
+                        For i = 0 To 3
+                            If .Hand(i).Value < .Hand(lowestCard).Value Then lowestCard = i
+                        Next i
+
+                        cardToRemove = .Hand(lowestCard).Position
+                    Case 2
+                        For i = 0 To 3
+                            If Not .Hand(i).Flagged Then
+                                If cardA = noCard Then
+                                    cardA = i
+                                ElseIf cardB = noCard Then
+                                    cardB = i
+                                End If
+                            End If
+                        Next i
+
+                        If .Hand(cardA).Suit = .Hand(cardB).Suit Then
+                            sumB = .Hand(cardA).Value + .Hand(cardB).Value
+
+                            If sumA > sumB Then
+                                If .Hand(cardA).Value > .Hand(cardB).Value Then
+                                    cardToRemove = .Hand(cardB).Position
+                                Else
+                                    cardToRemove = .Hand(cardA).Position
+                                End If
+                            Else
+                                lowestCard = 0
+                                For i = 0 To 3
+                                    If .Hand(i).Flagged Then
+                                        If Not .Hand(lowestCard).Flagged Then
+                                            lowestCard = i
+                                        Else
+                                            If .Hand(i).Value < .Hand(lowestCard).Value Then lowestCard = i
+                                        End If
+                                    End If
+                                Next i
+
+                                cardToRemove = .Hand(lowestCard).Position
+                            End If
+                        Else
+                            If .Hand(cardA).Value > .Hand(cardB).Value Then
+                                cardToRemove = .Hand(cardB).Position
+                            Else
+                                cardToRemove = .Hand(cardA).Position
+                            End If
+                        End If
+                    Case 3
+                        For i = 0 To 3
+                            If .Hand(i).Flagged Then
+                                sumA += .Hand(i).Value
+                            Else
+                                sumB = .Hand(i).Value
+                                oddCard = i
+                            End If
+                        Next i
+
+                        If sumA > sumB Then
+                            cardToRemove = .Hand(oddCard).Position
+                        Else
+                            lowestCard = 0
+                            For i = 0 To 3
+                                If .Hand(i).Flagged Then
+                                    If Not .Hand(lowestCard).Flagged Then
+                                        lowestCard = i
+                                    Else
+                                        If .Hand(i).Value < .Hand(lowestCard).Value Then lowestCard = i
+                                    End If
+                                End If
+                            Next i
+                            cardToRemove = .Hand(lowestCard).Position
+                        End If
+                    Case 4
+                        lowestCard = 0
+                        For i = 0 To 3
+                            If .Hand(i).Value < .Hand(lowestCard).Value Then lowestCard = i
+                        Next i
+                        cardToRemove = .Hand(lowestCard).Position
+                End Select
+
+                MoveCard(currentPlayer, CardOwners.Discard, cardToRemove)
+            End With
+        End If
 
         RefreshScreen()
 
