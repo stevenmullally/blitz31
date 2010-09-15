@@ -83,6 +83,7 @@ Public Class GameTable
     Private dealingCards As Boolean
     Private dealCardsSync As New Object
     Private dealCardsThread As Thread
+    Private cardsDealt As DateTime
 
     Private Enum CardOwners
         Deck = 0
@@ -98,6 +99,17 @@ Public Class GameTable
 #Region "Main Game Methods"
     Private Sub NewGame()
         Dim i As Byte
+
+        ' Check if cards were recently dealt to stop NewGame "spam"
+        If cardsDealt <> Nothing Then
+            If DateTime.Now.Subtract(cardsDealt).Seconds >= 1 Then
+                cardsDealt = DateTime.Now
+            Else
+                Exit Sub
+            End If
+        Else
+            cardsDealt = DateTime.Now
+        End If
 
         ' Get a lock on SyncObj to check if a computer thread is running
         SyncLock SyncObj

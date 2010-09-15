@@ -22,11 +22,13 @@ Partial Class About
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(About))
         Me.lblAppName = New System.Windows.Forms.Label
         Me.lblAppAuthor = New System.Windows.Forms.Label
         Me.lblAppVersion = New System.Windows.Forms.Label
         Me.btnOK = New System.Windows.Forms.Button
         Me.lblSiteURL = New System.Windows.Forms.LinkLabel
+        Me.btnDonate = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'lblAppName
@@ -61,7 +63,7 @@ Partial Class About
         '
         'btnOK
         '
-        Me.btnOK.Location = New System.Drawing.Point(81, 157)
+        Me.btnOK.Location = New System.Drawing.Point(12, 157)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 3
@@ -78,11 +80,25 @@ Partial Class About
         Me.lblSiteURL.Text = "SiteURL"
         Me.lblSiteURL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        'btnDonate
+        '
+        Me.btnDonate.AutoSize = True
+        Me.btnDonate.BackColor = System.Drawing.SystemColors.Control
+        Me.btnDonate.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.btnDonate.Image = CType(resources.GetObject("btnDonate.Image"), System.Drawing.Image)
+        Me.btnDonate.Location = New System.Drawing.Point(153, 157)
+        Me.btnDonate.Name = "btnDonate"
+        Me.btnDonate.Size = New System.Drawing.Size(80, 27)
+        Me.btnDonate.TabIndex = 5
+        Me.btnDonate.Text = "Donate"
+        Me.btnDonate.UseVisualStyleBackColor = False
+        '
         'About
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(240, 192)
+        Me.Controls.Add(Me.btnDonate)
         Me.Controls.Add(Me.lblSiteURL)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.lblAppVersion)
@@ -97,6 +113,7 @@ Partial Class About
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "About"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents lblAppName As System.Windows.Forms.Label
@@ -104,4 +121,5 @@ Partial Class About
     Friend WithEvents lblAppVersion As System.Windows.Forms.Label
     Friend WithEvents btnOK As System.Windows.Forms.Button
     Friend WithEvents lblSiteURL As System.Windows.Forms.LinkLabel
+    Friend WithEvents btnDonate As System.Windows.Forms.Button
 End Class
