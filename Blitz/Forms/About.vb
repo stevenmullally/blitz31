@@ -20,6 +20,7 @@ Public Class About
 
 #Region "Form Handlers"
     Private appSiteURL As String = "http://code.google.com/p/blitz31"
+    Private appDonateURL As String = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9XXRRN9KPWEFQ"
 
     Private Sub About_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim versionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
@@ -36,6 +37,10 @@ Public Class About
 #End Region
 
     Private Sub lblSiteURL_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblSiteURL.LinkClicked
-        System.Diagnostics.Process.Start(appSiteURL)
+        Process.Start(appSiteURL)
+    End Sub
+
+    Private Sub btnDonate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDonate.Click
+        Process.Start(appDonateURL)
     End Sub
 End Class
