@@ -58,6 +58,7 @@ Public Class GameTable
     Private dealingCards As Boolean
     Private dealingObj As New Object
     Private dealCardsThread As Thread
+    Private cardsDealt As DateTime = Nothing
 
     Private DEBUG_MODE As Boolean
 
@@ -353,11 +354,23 @@ Public Class GameTable
             PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
         End If
     End Sub
+
 #End Region
 
 #Region "Game Methods"
     Private Sub NewGame()
         Dim i As Byte
+
+        ' Check if cards were recently dealt to stop NewGame "spam"
+        If cardsDealt <> Nothing Then
+            If DateTime.Now.Subtract(cardsDealt).Seconds >= 1 Then
+                cardsDealt = DateTime.Now
+            Else
+                Exit Sub
+            End If
+        Else
+            cardsDealt = DateTime.Now
+        End If
 
         Cursor.Current = Cursors.WaitCursor
 
@@ -520,8 +533,7 @@ Public Class GameTable
         If DeckEmpty() Or Not roundActive Then
             RoundOver()
         Else
-            currentPlayer += 1
-            If currentPlayer > 4 Then currentPlayer = 1
+            currentPlayer = NextPlayer()
             TakeTurn()
         End If
     End Sub
@@ -540,7 +552,7 @@ Public Class GameTable
 #Region "Card Methods"
     Private Sub DealCards()
         Dim i As Byte
-        Dim player As Byte = Me.dealer + 1
+        Dim player As Byte = dealer + 1
 
         SyncLock dealingObj
             dealingCards = True
@@ -702,6 +714,14 @@ Public Class GameTable
         End With
     End Sub
 
+    Private Function NextPlayer() As Byte
+        NextPlayer = currentPlayer
+        Do
+            NextPlayer += 1
+            If NextPlayer > 4 Then NextPlayer = 1
+        Loop Until Me.Player(NextPlayer).InGame
+    End Function
+
     Private Sub SetCardLocations()
         With Player(CardOwners.Deck)
             Dim x As Integer = 0
@@ -845,7 +865,7 @@ Public Class GameTable
         Dim oddCard As Byte = noCard
         Dim hasAce As Boolean
         Dim i As Byte
-        Dim sleepTime As Byte = 0
+        Dim sleepTime As Byte = 1
 
         SyncLock computerObj
             takingTurn = True
