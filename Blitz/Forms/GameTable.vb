@@ -1207,6 +1207,7 @@ Public Class GameTable
             If Not Card.Initialize() Then Exit Sub
         Catch ex As Exception
             MsgBox("Unable to load card library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            Me.Close()
             Exit Sub
         End Try
 
