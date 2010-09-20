@@ -85,6 +85,8 @@ Public Class GameTable
     Private dealCardsThread As Thread
     Private cardsDealt As DateTime
 
+    Private updateThread As Thread
+
     Private Enum CardOwners
         Deck = 0
         Player1 = 1
@@ -1212,6 +1214,11 @@ Public Class GameTable
         UpdateScores(False)
         CreatePlayers()
         LoadSettings()
+
+        If UpdateOnStart Then
+            updateThread = New Thread(AddressOf CheckForUpdates)
+            updateThread.Start(False)
+        End If
     End Sub
 
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
@@ -1406,10 +1413,6 @@ Public Class GameTable
     Private Sub GameTable_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Dim updateList As String = Application.StartupPath & "\updatelist.txt"
 
-        If UpdateOnStart Then
-            RunAutoUpdate(False)
-        End If
-
         If FirstRun Or File.Exists(updateList) Then
             If File.Exists(updateList) Then Kill(updateList)
             FirstRun = False
@@ -1478,7 +1481,8 @@ Public Class GameTable
     End Sub
 
     Private Sub CheckForUpdatesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckForUpdatesToolStripMenuItem.Click
-        RunAutoUpdate(True)
+        updateThread = New Thread(AddressOf CheckForUpdates)
+        updateThread.Start(True)
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
@@ -1489,7 +1493,7 @@ Public Class GameTable
         Options.Show()
     End Sub
 
-    Private Sub RunAutoUpdate(ByVal showPopups As Boolean)
+    Private Sub CheckForUpdates(ByVal showPopups As Boolean)
         Dim PingOut As New Net.NetworkInformation.Ping
         Dim PingIn As Net.NetworkInformation.PingReply
         Dim CurrentBuild As String = getFileSHA(Application.ExecutablePath)
