@@ -1501,25 +1501,32 @@ Public Class GameTable
 
         ' Check if internet connection is availible
         Try
-            PingIn = PingOut.Send("www.psykad.com", 3000)
+            PingIn = PingOut.Send("www.ryanskeldon.com", 3000)
         Catch ex As Exception
             If showPopups Then MsgBox("Unable to connect to update server." & vbCrLf & _
-                "Please check your internet connection.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Update Failed")
+                "Please check your connection.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Update Failed")
             Exit Sub
         End Try
 
         If PingIn.Status = Net.NetworkInformation.IPStatus.Success Then
-            Dim UpdateInfoUrl As String = "http://www.psykad.com/software/blitz/updateinfo.txt"
+            Dim UpdateInfoUrl As String = "http://www.ryanskeldon.com/software/blitz/updateinfo.txt"
             Dim wc As New Net.WebClient
+            Dim wcbuffer As Byte()
 
             ' Download info on newest build
-            Dim wcbuffer As Byte() = wc.DownloadData(UpdateInfoUrl)
+            Try
+                wcbuffer = wc.DownloadData(UpdateInfoUrl)
+            Catch ex As Exception
+                MsgBox("Unable to download update info.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Update Failed")
+                Exit Sub
+            End Try
+
             Dim NewestBuild As String = System.Text.ASCIIEncoding.ASCII.GetString(wcbuffer)
 
             ' Check to see if the current build is up to date
             If CurrentBuild <> NewestBuild Or System.IO.File.Exists(Application.StartupPath & "\debug") Then
                 Dim MsgBoxAnswer As MsgBoxResult
-                Dim SourceFileURL As String = "http://www.psykad.com/software/blitz/bin/AutoUpdater.exe"
+                Dim SourceFileURL As String = "http://www.ryanskeldon.com/software/blitz/bin/AutoUpdater.exe"
                 Dim DestinationFileURL As String = Application.StartupPath & "\AutoUpdater.exe"
 
                 MsgBoxAnswer = MsgBox("An update is available! Would you like to update now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Blitz Update")
