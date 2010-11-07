@@ -27,6 +27,7 @@ Partial Class GameTable
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.NewGameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.CheckForUpdatesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -48,7 +49,6 @@ Partial Class GameTable
         Me.lblScore1 = New System.Windows.Forms.Label
         Me.lblScoreName1 = New System.Windows.Forms.Label
         Me.btnNewRound = New System.Windows.Forms.Button
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.MainMenu.SuspendLayout()
         Me.ScoreBox.SuspendLayout()
         Me.SuspendLayout()
@@ -59,7 +59,7 @@ Partial Class GameTable
         Me.MainMenu.Location = New System.Drawing.Point(0, 0)
         Me.MainMenu.Name = "MainMenu"
         Me.MainMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
-        Me.MainMenu.Size = New System.Drawing.Size(594, 24)
+        Me.MainMenu.Size = New System.Drawing.Size(584, 24)
         Me.MainMenu.TabIndex = 0
         Me.MainMenu.Text = "MenuStrip1"
         '
@@ -67,27 +67,32 @@ Partial Class GameTable
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewGameToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.ToolStripSeparator1, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(94, 20)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "&File"
         '
         'NewGameToolStripMenuItem
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.NewGameToolStripMenuItem.Text = "&New Game"
         '
         'OptionsToolStripMenuItem
         '
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4
-        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.OptionsToolStripMenuItem.Text = "&Options"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(148, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'HelpToolStripMenuItem
@@ -116,7 +121,7 @@ Partial Class GameTable
         Me.btnDrawCard.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnDrawCard.Location = New System.Drawing.Point(199, 383)
         Me.btnDrawCard.Name = "btnDrawCard"
-        Me.btnDrawCard.Size = New System.Drawing.Size(92, 33)
+        Me.btnDrawCard.Size = New System.Drawing.Size(89, 33)
         Me.btnDrawCard.TabIndex = 1
         Me.btnDrawCard.Text = "Draw Card"
         Me.btnDrawCard.UseVisualStyleBackColor = False
@@ -129,7 +134,7 @@ Partial Class GameTable
         Me.btnDiscard.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnDiscard.Location = New System.Drawing.Point(310, 383)
         Me.btnDiscard.Name = "btnDiscard"
-        Me.btnDiscard.Size = New System.Drawing.Size(92, 33)
+        Me.btnDiscard.Size = New System.Drawing.Size(91, 33)
         Me.btnDiscard.TabIndex = 2
         Me.btnDiscard.Text = "Select Card"
         Me.btnDiscard.UseVisualStyleBackColor = False
@@ -138,44 +143,44 @@ Partial Class GameTable
         'lblPlayer1
         '
         Me.lblPlayer1.AutoSize = True
-        Me.lblPlayer1.Font = New System.Drawing.Font("Traditional Arabic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPlayer1.Font = New System.Drawing.Font("Traditional Arabic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPlayer1.ForeColor = System.Drawing.Color.White
         Me.lblPlayer1.Location = New System.Drawing.Point(533, 24)
         Me.lblPlayer1.Name = "lblPlayer1"
-        Me.lblPlayer1.Size = New System.Drawing.Size(54, 26)
+        Me.lblPlayer1.Size = New System.Drawing.Size(44, 23)
         Me.lblPlayer1.TabIndex = 3
         Me.lblPlayer1.Text = "Label1"
         '
         'lblPlayer2
         '
         Me.lblPlayer2.AutoSize = True
-        Me.lblPlayer2.Font = New System.Drawing.Font("Traditional Arabic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPlayer2.Font = New System.Drawing.Font("Traditional Arabic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPlayer2.ForeColor = System.Drawing.Color.White
         Me.lblPlayer2.Location = New System.Drawing.Point(533, 42)
         Me.lblPlayer2.Name = "lblPlayer2"
-        Me.lblPlayer2.Size = New System.Drawing.Size(54, 26)
+        Me.lblPlayer2.Size = New System.Drawing.Size(44, 23)
         Me.lblPlayer2.TabIndex = 4
         Me.lblPlayer2.Text = "Label2"
         '
         'lblPlayer3
         '
         Me.lblPlayer3.AutoSize = True
-        Me.lblPlayer3.Font = New System.Drawing.Font("Traditional Arabic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPlayer3.Font = New System.Drawing.Font("Traditional Arabic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPlayer3.ForeColor = System.Drawing.Color.White
         Me.lblPlayer3.Location = New System.Drawing.Point(532, 62)
         Me.lblPlayer3.Name = "lblPlayer3"
-        Me.lblPlayer3.Size = New System.Drawing.Size(54, 26)
+        Me.lblPlayer3.Size = New System.Drawing.Size(44, 23)
         Me.lblPlayer3.TabIndex = 5
         Me.lblPlayer3.Text = "Label3"
         '
         'lblPlayer4
         '
         Me.lblPlayer4.AutoSize = True
-        Me.lblPlayer4.Font = New System.Drawing.Font("Traditional Arabic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPlayer4.Font = New System.Drawing.Font("Traditional Arabic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPlayer4.ForeColor = System.Drawing.Color.White
         Me.lblPlayer4.Location = New System.Drawing.Point(532, 80)
         Me.lblPlayer4.Name = "lblPlayer4"
-        Me.lblPlayer4.Size = New System.Drawing.Size(54, 26)
+        Me.lblPlayer4.Size = New System.Drawing.Size(44, 23)
         Me.lblPlayer4.TabIndex = 6
         Me.lblPlayer4.Text = "Label4"
         '
@@ -295,17 +300,12 @@ Partial Class GameTable
         Me.btnNewRound.UseVisualStyleBackColor = True
         Me.btnNewRound.Visible = False
         '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
-        '
         'GameTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.ClientSize = New System.Drawing.Size(594, 616)
+        Me.ClientSize = New System.Drawing.Size(584, 616)
         Me.Controls.Add(Me.btnNewRound)
         Me.Controls.Add(Me.ScoreBox)
         Me.Controls.Add(Me.lblStatus)
@@ -320,8 +320,6 @@ Partial Class GameTable
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MainMenu
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(600, 644)
-        Me.MinimumSize = New System.Drawing.Size(600, 644)
         Me.Name = "GameTable"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Blitz"

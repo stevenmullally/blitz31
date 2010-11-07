@@ -65,6 +65,10 @@ Public Class GameTable
     Private KnockActive As Boolean = False
     Private DebugMode As Boolean = False
 
+    ' Window properties
+    Private screenWidth As Integer
+    Private screenHeight As Integer
+
     ' Card properties
     Private Const NoCard As Byte = 52
     Private Const DeckPattern As Byte = 52
@@ -142,7 +146,8 @@ Public Class GameTable
 
         ' Game is ready
         GameActive = True
-
+        UpdateHandLocations()
+        
         ' Set cursor back to normal
         Cursor.Current = Cursors.Arrow
 
@@ -851,6 +856,31 @@ Public Class GameTable
         End With
     End Sub
 
+    Private Sub SetControlLocations()
+        lblStatus.Location = New Point((screenWidth / 2) - (lblStatus.Width / 2), (screenHeight / 2) + 54)
+        btnDrawCard.Location = New Point((screenWidth / 2) - btnDrawCard.Width - 10, (screenHeight / 2) + 100)
+        btnDiscard.Location = New Point((screenWidth / 2) + 10, (screenHeight / 2) + 100)
+        btnNewRound.Location = New Point((screenWidth / 2) - (btnNewRound.Width / 2), (screenHeight / 2) + 100)
+        RefreshScreen()
+    End Sub
+
+    Private Sub UpdateHandLocations()
+        Players(CardOwners.Deck).X = ((screenWidth / 2) - 10 - Card.CardWidth)
+        Players(CardOwners.Deck).Y = ((screenHeight / 2) - (Card.CardHeight / 2))
+
+        Players(CardOwners.Discard).X = (screenWidth / 2) + 10
+        Players(CardOwners.Discard).Y = (screenHeight / 2) - (Card.CardHeight / 2)
+
+        Players(1).MidX = (screenWidth / 2)
+        Players(1).MidY = (screenHeight / 2) + 200
+        Players(2).MidX = (screenWidth / 2) - 200
+        Players(2).MidY = (screenHeight / 2)
+        Players(3).MidX = (screenWidth / 2)
+        Players(3).MidY = (screenHeight / 2) - 200
+        Players(4).MidX = (screenWidth / 2) + 200
+        Players(4).MidY = (screenHeight / 2)
+    End Sub
+
     Private Sub SetLabelLocations()
         lblPlayer1.Location = New Point(Players(1).MidX - 50, Players(1).MidY + (CardHeight / 2) + 5)
         lblPlayer2.Location = New Point(Players(2).MidX - (CardWidth / 2) - 20, Players(2).MidY + CardHeight + 10)
@@ -1211,6 +1241,7 @@ Public Class GameTable
             Exit Sub
         End Try
 
+        AdjustResolution()
         SetStatus("", 0, True)
         UpdateScores(False)
         CreatePlayers()
@@ -1419,6 +1450,38 @@ Public Class GameTable
             FirstRun = False
             SaveSettings()
         End If
+
+        SetControlLocations()
+    End Sub
+
+    Private Sub GameTable_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        ' Update height/width fields to new form size.
+        screenHeight = Me.Size.Height
+        screenWidth = Me.Size.Width
+
+        ' Update the card locations with the new parameters.
+        If gameActive Then
+            UpdateHandLocations()
+        End If
+
+        SetControlLocations()
+        RefreshScreen()
+    End Sub
+
+    Private Sub AdjustResolution()
+        Dim myDPI As Graphics = Me.CreateGraphics
+        Dim fontSize As Integer
+
+        If myDPI.DpiX <= 96 Then
+            fontSize = 12
+        Else
+            fontSize = 10
+        End If
+
+        lblPlayer1.Font = New Font(lblPlayer1.Font.FontFamily, fontSize, lblPlayer1.Font.Style)
+        lblPlayer2.Font = New Font(lblPlayer2.Font.FontFamily, fontSize, lblPlayer2.Font.Style)
+        lblPlayer3.Font = New Font(lblPlayer3.Font.FontFamily, fontSize, lblPlayer3.Font.Style)
+        lblPlayer4.Font = New Font(lblPlayer4.Font.FontFamily, fontSize, lblPlayer4.Font.Style)
     End Sub
 #End Region
 

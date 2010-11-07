@@ -58,6 +58,7 @@ Partial Class Options
         'txtPlayer4Name
         '
         Me.txtPlayer4Name.Location = New System.Drawing.Point(60, 100)
+        Me.txtPlayer4Name.MaxLength = 8
         Me.txtPlayer4Name.Name = "txtPlayer4Name"
         Me.txtPlayer4Name.Size = New System.Drawing.Size(100, 20)
         Me.txtPlayer4Name.TabIndex = 7
@@ -65,6 +66,7 @@ Partial Class Options
         'txtPlayer3Name
         '
         Me.txtPlayer3Name.Location = New System.Drawing.Point(60, 74)
+        Me.txtPlayer3Name.MaxLength = 8
         Me.txtPlayer3Name.Name = "txtPlayer3Name"
         Me.txtPlayer3Name.Size = New System.Drawing.Size(100, 20)
         Me.txtPlayer3Name.TabIndex = 6
@@ -72,6 +74,7 @@ Partial Class Options
         'txtPlayer2Name
         '
         Me.txtPlayer2Name.Location = New System.Drawing.Point(60, 48)
+        Me.txtPlayer2Name.MaxLength = 8
         Me.txtPlayer2Name.Name = "txtPlayer2Name"
         Me.txtPlayer2Name.Size = New System.Drawing.Size(100, 20)
         Me.txtPlayer2Name.TabIndex = 5
@@ -79,6 +82,7 @@ Partial Class Options
         'txtPlayer1Name
         '
         Me.txtPlayer1Name.Location = New System.Drawing.Point(60, 22)
+        Me.txtPlayer1Name.MaxLength = 8
         Me.txtPlayer1Name.Name = "txtPlayer1Name"
         Me.txtPlayer1Name.Size = New System.Drawing.Size(100, 20)
         Me.txtPlayer1Name.TabIndex = 4
