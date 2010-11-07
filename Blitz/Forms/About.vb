@@ -19,7 +19,7 @@ Option Explicit On
 Public Class About
 
 #Region "Form Handlers"
-    Private appSiteURL As String = "http://code.google.com/p/blitz31"
+    Private appSiteURL As String = "http://blitz31.googlecode.com/"
     Private appDonateURL As String = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9XXRRN9KPWEFQ"
 
     Private Sub About_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
