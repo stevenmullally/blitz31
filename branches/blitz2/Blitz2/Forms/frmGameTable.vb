@@ -1,5 +1,5 @@
 ﻿'    Blitz, a simple draw and discard game, suitable for players of all ages.
-'    Copyright (C) 2009-2010  Ryan Skeldon <psykad@gmail.com>
+'    Copyright (C) 2009-2012  Ryan Skeldon <psykad@gmail.com>
 '
 '    This program is free software; you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ Imports Blitz2.Objects
 Imports Blitz2.Objects.Card
 Imports Blitz2.Objects.Player
 
-Public Class GameTable
+Public Class frmGameTable
 #Region "Game Fields"
     Private deck(51) As Card
     Public Player(5) As Player
@@ -231,7 +231,8 @@ Public Class GameTable
             UpdateHandLocations()
         End If
 
-        RefreshScreen()
+        ' Check to see if form is visible before trying to refresh the screen
+        If Me.Visible Then RefreshScreen()
     End Sub
 
     Private Sub GameTable_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
@@ -1167,5 +1168,10 @@ Public Class GameTable
     Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
         Me.Close()
     End Sub
+
+    Private Sub AboutBlitzToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutBlitzToolStripMenuItem.Click
+        frmAbout.Show()
+    End Sub
 #End Region
+
 End Class
