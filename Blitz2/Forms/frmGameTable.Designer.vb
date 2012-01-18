@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class GameTable
+Partial Class frmGameTable
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -22,12 +22,14 @@ Partial Class GameTable
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.MainMenu = New System.Windows.Forms.MenuStrip
-        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.NewGameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGameTable))
+        Me.MainMenu = New System.Windows.Forms.MenuStrip()
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.NewGameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutBlitzToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MainMenu.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -53,25 +55,32 @@ Partial Class GameTable
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.NewGameToolStripMenuItem.Text = "New Game"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(148, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'HelpToolStripMenuItem
         '
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBlitzToolStripMenuItem})
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
         Me.HelpToolStripMenuItem.Text = "&Help"
+        '
+        'AboutBlitzToolStripMenuItem
+        '
+        Me.AboutBlitzToolStripMenuItem.Name = "AboutBlitzToolStripMenuItem"
+        Me.AboutBlitzToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.AboutBlitzToolStripMenuItem.Text = "&About Blitz"
         '
         'GameTable
         '
@@ -81,6 +90,7 @@ Partial Class GameTable
         Me.ClientSize = New System.Drawing.Size(601, 601)
         Me.Controls.Add(Me.MainMenu)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MainMenu
         Me.MaximizeBox = False
         Me.Name = "GameTable"
@@ -97,5 +107,6 @@ Partial Class GameTable
     Friend WithEvents NewGameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AboutBlitzToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class
