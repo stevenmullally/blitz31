@@ -799,7 +799,7 @@ Public Class GameTable
         DiscardBottom = NoCard
 
         SyncLock dealCardsSync
-            dealingCards = False
+            dealingCards = True
         End SyncLock
 
         StartNewRound()
