@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Blitz")> 
+<Assembly: AssemblyTitle("Blitz2")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("Ryan Skeldon")> 
-<Assembly: AssemblyProduct("Blitz")> 
+<Assembly: AssemblyProduct("Blitz2")> 
 <Assembly: AssemblyCopyright("GNU General Public License v2")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("188bb72a-75e1-4bb0-9d3e-4fb0085f191f")> 
+<Assembly: Guid("10226952-b972-43aa-86e3-a447f2d03c4b")> 
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.1.0.436")> 
+<Assembly: AssemblyVersion("2.0.0.0")> 
+<Assembly: AssemblyFileVersion("2.0.0.0")> 
