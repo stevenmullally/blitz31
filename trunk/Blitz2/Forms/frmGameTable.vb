@@ -16,9 +16,9 @@
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Option Explicit On
 Imports System.Threading
-Imports Blitz2.Objects
-Imports Blitz2.Objects.Card
-Imports Blitz2.Objects.Player
+Imports Blitz.Objects
+Imports Blitz.Objects.Card
+Imports Blitz.Objects.Player
 
 Public Class frmGameTable
 #Region "Game Fields"

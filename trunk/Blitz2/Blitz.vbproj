@@ -7,9 +7,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A52D64BA-DD60-4DB5-8B89-0A75331A63B1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Blitz2.My.MyApplication</StartupObject>
-    <RootNamespace>Blitz2</RootNamespace>
-    <AssemblyName>Blitz2</AssemblyName>
+    <StartupObject>Blitz.My.MyApplication</StartupObject>
+    <RootNamespace>Blitz</RootNamespace>
+    <AssemblyName>Blitz</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -52,7 +52,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Blitz2.xml</DocumentationFile>
+    <DocumentationFile>Blitz.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -61,7 +61,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Blitz2.xml</DocumentationFile>
+    <DocumentationFile>Blitz.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
