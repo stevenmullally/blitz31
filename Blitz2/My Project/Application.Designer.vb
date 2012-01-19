@@ -32,7 +32,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.Blitz2.frmGameTable
+            Me.MainForm = Global.Blitz.frmGameTable
         End Sub
     End Class
 End Namespace

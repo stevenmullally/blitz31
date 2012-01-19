@@ -21,7 +21,7 @@ Public Class frmAbout
     Private Sub frmAbout_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim versionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
 
-        txtLicense.Text = Blitz2.My.Resources.COPYING
+        txtLicense.Text = Blitz.My.Resources.COPYING
         lblAppVersion.Text = "Version " & versionInfo.ProductVersion
     End Sub
 

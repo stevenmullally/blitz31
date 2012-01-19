@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Blitz2")> 
+<Assembly: AssemblyTitle("Blitz")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("Ryan Skeldon")> 
-<Assembly: AssemblyProduct("Blitz2")> 
+<Assembly: AssemblyProduct("Blitz")> 
 <Assembly: AssemblyCopyright("GNU General Public License v2")> 
 <Assembly: AssemblyTrademark("")> 
 
