@@ -245,6 +245,60 @@ Namespace Objects
                 If Not Hand(FreeCard).InUse Then Return FreeCard
             Next
         End Function
+
+        Public Function MasterSuit() As Byte
+            Dim highestCard As Byte
+            Dim suits(3) As Byte
+            Dim sumA As Byte = 0
+            Dim sumB As Byte = 0
+            Dim i As Byte
+
+            MasterSuit = 0
+
+            With Me
+                For i = 0 To 2
+                    suits(.Hand(i).Suit) += 1
+                    .Hand(i).Flagged = False
+                Next
+
+                For i = 0 To 3
+                    If suits(i) > suits(MasterSuit) Then MasterSuit = i
+                Next
+
+                Select Case suits(MasterSuit)
+                    Case 1
+                        For i = 0 To 2
+                            If .Hand(i).Value > .Hand(highestCard).Value Then highestCard = i
+                        Next
+                        MasterSuit = .Hand(highestCard).Suit
+                        .Hand(highestCard).Flagged = True
+                    Case 2
+                        For i = 0 To 2
+                            If .Hand(i).Suit = MasterSuit Then
+                                .Hand(i).Flagged = True
+                                sumA += .Hand(i).Value
+                            Else
+                                sumB += .Hand(i).Value
+                            End If
+                        Next
+
+                        For i = 0 To 2
+                            If sumA > sumB Then
+                                If .Hand(i).Flagged Then MasterSuit = .Hand(i).Suit
+                            Else
+                                If Not .Hand(i).Flagged Then MasterSuit = .Hand(i).Suit
+                            End If
+                        Next
+                    Case 3
+                        For i = 0 To 2
+                            .Hand(i).Flagged = True
+                        Next
+                        MasterSuit = .Hand(0).Suit
+                End Select
+
+                Return MasterSuit
+            End With
+        End Function
 #End Region
     End Class
 End Namespace
