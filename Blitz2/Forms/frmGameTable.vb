@@ -784,7 +784,7 @@ Public Class frmGameTable
     End Function
 
     Private Function PlayerScore(ByVal player As Byte) As Byte
-        Dim masterSuit As Byte = GetMasterSuit(player)
+        Dim masterSuit As Byte = Me.Player(player).MasterSuit
         Dim score As Byte
         Dim i As Byte
 
@@ -799,61 +799,8 @@ Public Class frmGameTable
         Return score
     End Function
 
-    Private Function GetMasterSuit(ByVal player As Byte) As Byte
-        Dim masterSuit As Byte
-        Dim highestCard As Byte
-        Dim suits(3) As Byte
-        Dim sumA As Byte = 0
-        Dim sumB As Byte = 0
-        Dim i As Byte
-
-        With Me.Player(player)
-            For i = 0 To 2
-                suits(.Hand(i).Suit) += 1
-                .Hand(i).Flagged = False
-            Next
-
-            For i = 0 To 3
-                If suits(i) > suits(masterSuit) Then masterSuit = i
-            Next
-
-            Select Case suits(masterSuit)
-                Case 1
-                    For i = 0 To 2
-                        If .Hand(i).Value > .Hand(highestCard).Value Then highestCard = i
-                    Next
-                    masterSuit = .Hand(highestCard).Suit
-                    .Hand(highestCard).Flagged = True
-                Case 2
-                    For i = 0 To 2
-                        If .Hand(i).Suit = masterSuit Then
-                            .Hand(i).Flagged = True
-                            sumA += .Hand(i).Value
-                        Else
-                            sumB += .Hand(i).Value
-                        End If
-                    Next
-
-                    For i = 0 To 2
-                        If sumA > sumB Then
-                            If .Hand(i).Flagged Then masterSuit = .Hand(i).Suit
-                        Else
-                            If Not .Hand(i).Flagged Then masterSuit = .Hand(i).Suit
-                        End If
-                    Next
-                Case 3
-                    For i = 0 To 2
-                        .Hand(i).Flagged = True
-                    Next
-                    masterSuit = .Hand(0).Suit
-            End Select
-
-            Return masterSuit
-        End With
-    End Function
-
     Private Sub ComputerTurn()
-        Dim masterSuit As Byte = GetMasterSuit(currentPlayer)
+        Dim masterSuit As Byte = Me.Player(currentPlayer).MasterSuit
         Dim suits(3) As Byte
         Dim highestCard As Byte
         Dim lowestCard As Byte
