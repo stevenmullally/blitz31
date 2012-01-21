@@ -246,6 +246,11 @@ Namespace Objects
             Next
         End Function
 
+        ''' <summary>
+        ''' The suit in the player's hand with the highest value.
+        ''' </summary>
+        ''' <returns>The suit with the highest value.</returns>
+        ''' <remarks></remarks>
         Public Function MasterSuit() As Byte
             Dim highestCard As Byte
             Dim suits(3) As Byte
@@ -298,6 +303,23 @@ Namespace Objects
 
                 Return MasterSuit
             End With
+        End Function
+
+        ''' <summary>
+        ''' The player's score.
+        ''' </summary>
+        ''' <returns>The player's score.</returns>
+        ''' <remarks></remarks>
+        Public Function Score() As Byte
+            Dim masterSuit As Byte = Me.MasterSuit
+
+            Score = 0
+
+            For i As Byte = 0 To 2
+                If Me.Hand(i).Suit = masterSuit Then Score += Me.Hand(i).Value
+            Next
+
+            Return Score
         End Function
 #End Region
     End Class
