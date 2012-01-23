@@ -24,7 +24,7 @@ Public Class frmGameTable
 #Region "Game Fields"
     Public Const ConfigFile As String = "config.xml"
     Private deck(51) As Card
-    Public Player(5) As Player
+    Private player(5) As Player
 
     Private seed As Integer = -1
 
@@ -169,8 +169,8 @@ Public Class frmGameTable
 
         ' Check if a valid card was selected.
         For i = 0 To UBound(deck)
-            If deck(i).Owner = 1 And Player(1).TotalCards = 4 Then
-                With Player(1).HandLocation
+            If deck(i).Owner = 1 And player(1).TotalCards = 4 Then
+                With player(1).HandLocation
                     If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
                        (y >= .Y) And (y <= (.Y + Objects.Card.CardHeight)) Then
 
@@ -180,14 +180,14 @@ Public Class frmGameTable
                     End If
                 End With
 
-                With Player(1)
+                With player(1)
                     .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                 End With
             ElseIf deck(i).Owner = CardOwners.Discard Then
-                With Player(CardOwners.Discard).HandLocation
+                With player(CardOwners.Discard).HandLocation
                     If (x >= .X) And (x <= (.X + Objects.Card.CardWidth)) And _
                        (y >= .Y) And (y <= (.Y + Objects.Card.CardHeight)) And _
-                       Player(1).TotalCards < 4 Then
+                       player(1).TotalCards < 4 Then
 
                         card = i
                         cardOwner = CardOwners.Discard
@@ -197,7 +197,7 @@ Public Class frmGameTable
             Else
                 If (x >= deckTopLocation.X) And (x <= (deckTopLocation.X + Objects.Card.CardWidth)) And _
                    (y >= deckTopLocation.Y) And (y <= (deckTopLocation.Y + Objects.Card.CardHeight)) And _
-                    Player(1).TotalCards < 4 And Not DeckEmpty() Then
+                    player(1).TotalCards < 4 And Not DeckEmpty() Then
 
                     card = FreeCard()
                     validSelection = True
@@ -209,7 +209,7 @@ Public Class frmGameTable
         ' Flag the card if it was a valid selection.
         If validSelection Then
             If deck(card).Owner = CardOwners.Deck Then
-                Player(CardOwners.Deck).Flagged = True
+                player(CardOwners.Deck).Flagged = True
             End If
             deck(card).Invert = True
         End If
@@ -248,14 +248,14 @@ Public Class frmGameTable
         For i = 0 To UBound(deck)
             Select Case deck(i).Owner
                 Case 1
-                    With Player(1)
+                    With player(1)
                         If .InGame Then
                             PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
                     End With
                 Case 2, 3, 4
-                    With Player(deck(i).Owner)
+                    With player(deck(i).Owner)
                         If .InGame Then
                             If Not roundActive Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
@@ -293,9 +293,9 @@ Public Class frmGameTable
 
             For i = 0 To n
                 If i = n Then
-                    PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, Player(CardOwners.Deck).Flagged)
+                    PaintCard(e.Graphics, New Point(player(CardOwners.Deck).HandLocation.X - x, player(CardOwners.Deck).HandLocation.Y - y), noCard, player(CardOwners.Deck).Flagged)
                 Else
-                    PaintCard(e.Graphics, New Point(Player(CardOwners.Deck).HandLocation.X - x, Player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
+                    PaintCard(e.Graphics, New Point(player(CardOwners.Deck).HandLocation.X - x, player(CardOwners.Deck).HandLocation.Y - y), noCard, False)
                 End If
 
                 x += 1 : y += 1
@@ -325,12 +325,12 @@ Public Class frmGameTable
 
             If discardCount > 1 Then
                 For i = 0 To n
-                    PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, False)
+                    PaintCard(e.Graphics, New Point(player(CardOwners.Discard).HandLocation.X - x, player(CardOwners.Discard).HandLocation.Y - y), discardTop, False)
                     x += 1 : y += 1
                 Next
             End If
 
-            PaintCard(e.Graphics, New Point(Player(CardOwners.Discard).HandLocation.X - x, Player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
+            PaintCard(e.Graphics, New Point(player(CardOwners.Discard).HandLocation.X - x, player(CardOwners.Discard).HandLocation.Y - y), discardTop, deck(discardTop).Invert)
         End If
     End Sub
 
@@ -380,8 +380,8 @@ Public Class frmGameTable
 
         ' Reset player scores.
         For i = 1 To 4
-            Me.Player(i).Tokens = 4
-            Me.Player(i).InGame = True
+            player(i).Tokens = 4
+            player(i).InGame = True
         Next
 
         dealer = 4
@@ -403,8 +403,8 @@ Public Class frmGameTable
 
         ' Reset player hands.
         For i = 0 To 4
-            Player(i).CreateNewHand()
-            Player(i).Flagged = False
+            player(i).CreateNewHand()
+            player(i).Flagged = False
         Next
 
         roundActive = True
@@ -422,26 +422,19 @@ Public Class frmGameTable
     End Sub
 
     Private Sub DoStartNewRound()
-        Dim i As Byte
-
-        Cursor.Current = Cursors.WaitCursor
-
-        For i = 1 To 4
-            If HasBlitz(i) And roundActive Then
+        ' Check if any player has Blitz
+        For i As Byte = 1 To 4
+            If player(i).Score = 31 Then
                 blitzActive = True
                 roundActive = False
             End If
         Next
 
         If roundActive Then
-            Cursor.Current = Cursors.Arrow
-            RefreshScreen()
             TakeTurn()
         Else
             RoundOver()
         End If
-
-        Cursor.Current = Cursors.Arrow
     End Sub
 
     Private Sub StartNewRound()
@@ -463,7 +456,7 @@ Public Class frmGameTable
 
         Dim activePlayers As Byte = 0
         For i As Byte = 1 To 4
-            With Player(i)
+            With player(i)
                 If .Tokens >= 0 Then
                     .InGame = True
                     activePlayers += 1
@@ -473,7 +466,7 @@ Public Class frmGameTable
             End With
         Next
 
-        If activePlayers = 1 Or Not Player(1).InGame Then
+        If activePlayers = 1 Or Not player(1).InGame Then
             GameOver()
         End If
 
@@ -483,25 +476,23 @@ Public Class frmGameTable
         Do
             dealer += 1
             If dealer > 4 Then dealer = 1
-        Loop Until Player(dealer).InGame
+        Loop Until player(dealer).InGame
 
         ' Set currentPlayer to player clock-wise of dealer
         currentPlayer = dealer
         Do
             currentPlayer += 1
             If currentPlayer > 4 Then currentPlayer = 1
-        Loop Until Player(currentPlayer).InGame
+        Loop Until player(currentPlayer).InGame
     End Sub
 
     Private Sub TakeTurn()
-        Cursor.Current = Cursors.WaitCursor
         pickupCard = noCard
-        RefreshScreen()
 
         If DeckEmpty() Then
             RoundOver()
         Else
-            If Me.Player(currentPlayer).InGame Then
+            If player(currentPlayer).InGame Then
                 If knockActive And currentPlayer = knocker Then
                     RoundOver()
                 Else
@@ -513,7 +504,7 @@ Public Class frmGameTable
                             ' Player X's turn.
                     End Select
 
-                    Select Case Me.Player(currentPlayer).Mode
+                    Select Case player(currentPlayer).Mode
                         Case Modes.Human
                             If knockActive Then
                                 ' Disable ability to knock.
@@ -531,17 +522,15 @@ Public Class frmGameTable
                 TurnOver()
             End If
         End If
-
-        Cursor.Current = Cursors.Arrow
     End Sub
 
     Private Sub DoTurnOver()
         If knockActive And knocker = currentPlayer Then
             ' Show that the player knocked
-            Debug.WriteLine(Player(currentPlayer).Name & " has knocked.")
+            Debug.WriteLine(player(currentPlayer).Name & " has knocked.")
         End If
 
-        If HasBlitz(currentPlayer) And roundActive Then
+        If player(currentPlayer).Score = 31 And roundActive Then
             blitzActive = True
             roundActive = False
         End If
@@ -575,25 +564,24 @@ Public Class frmGameTable
 
 #Region "Card Methods"
     Private Sub DealCards()
-        Dim i As Byte
-        Dim player As Byte = dealer + 1
+        Dim p As Byte = dealer + 1
 
         SyncLock dealingObj
             dealingCards = True
         End SyncLock
 
-        For i = 1 To 12
-            If player > 4 Then player = 1
+        For i As Byte = 1 To 12
+            If p > 4 Then p = 1
 
-            If Me.Player(player).InGame Then
-                MoveCard(CardOwners.Deck, player)
+            If player(p).InGame Then
+                MoveCard(CardOwners.Deck, p)
                 RefreshScreen()
 #If Not Debug Then
                 Thread.Sleep(100)
 #End If
             End If
 
-            player += 1
+            p += 1
         Next
 
         MoveCard(CardOwners.Deck, CardOwners.Discard)
@@ -622,7 +610,7 @@ Public Class frmGameTable
 
                         Select Case toPlayer
                             Case 1, 2, 3, 4
-                                Player(toPlayer).AddCard(card)
+                                player(toPlayer).AddCard(card)
                             Case CardOwners.Discard
                                 discardTop = card
                         End Select
@@ -632,7 +620,7 @@ Public Class frmGameTable
             Case CardOwners.Discard
                 pickupCard = card
                 deck(card).Owner = toPlayer
-                Player(toPlayer).AddCard(card)
+                player(toPlayer).AddCard(card)
 
                 discardTop = discardBottom
 
@@ -652,7 +640,7 @@ Public Class frmGameTable
                 deck(card).Owner = CardOwners.Discard
                 discardCount += 1
 
-                Player(fromPlayer).RemoveCard(card)
+                player(fromPlayer).RemoveCard(card)
         End Select
 
         ResetInverts()
@@ -677,7 +665,7 @@ Public Class frmGameTable
             deck(i).Invert = False
         Next
 
-        Player(CardOwners.Deck).Flagged = False
+        player(CardOwners.Deck).Flagged = False
     End Sub
 
     Private Function CardsLeft() As Byte
@@ -691,9 +679,7 @@ Public Class frmGameTable
     End Function
 
     Private Function DeckEmpty() As Boolean
-        Dim i As Byte
-
-        For i = 0 To UBound(deck)
+        For i As Byte = 0 To UBound(deck)
             If deck(i).Owner = CardOwners.Deck Then Return False
         Next
 
@@ -724,17 +710,17 @@ Public Class frmGameTable
     Private Sub CreatePlayers()
         Dim i As Byte
 
-        For i = 0 To UBound(Me.Player)
-            Me.Player(i) = New Player(Modes.Computer)
+        For i = 0 To UBound(player)
+            player(i) = New Player(Modes.Computer)
         Next
 
-        Me.Player(1).Mode = Modes.Human
+        player(1).Mode = Modes.Human
 
         With Me
-            .Player(1).Name = "Player 1"
-            .Player(2).Name = "Player 2"
-            .Player(3).Name = "Player 3"
-            .Player(4).Name = "Player 4"
+            .player(1).Name = "Player 1"
+            .player(2).Name = "Player 2"
+            .player(3).Name = "Player 3"
+            .player(4).Name = "Player 4"
 
             UpdateHandLocations()
         End With
@@ -745,11 +731,11 @@ Public Class frmGameTable
         Do
             NextPlayer += 1
             If NextPlayer > 4 Then NextPlayer = 1
-        Loop Until Me.Player(NextPlayer).InGame
+        Loop Until player(NextPlayer).InGame
     End Function
 
     Private Sub SetCardLocations()
-        With Player(CardOwners.Deck)
+        With player(CardOwners.Deck)
             Dim x As Integer = 0
             Dim y As Integer = 0
             Dim n As Integer = 0
@@ -773,59 +759,35 @@ Public Class frmGameTable
 
             deckTopLocation = New Point(.HandLocation.X - x, .HandLocation.Y - y)
         End With
-        With Player(1)
+        With player(1)
             .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth + (cardOffsetX * (.TotalCards - 1))) / 2, _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
-        With Player(2)
+        With player(2)
             .HandLocation = New Point(.HandLocationMid.X - (Card.CardWidth + (cardOffsetX * (.TotalCards - 1))) / 2, _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
-        With Player(3)
+        With player(3)
             .HandLocation = New Point(.HandLocationMid.X - ((Card.CardWidth + cardOffsetX * (.TotalCards - 1)) / 2), _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
-        With Player(4)
+        With player(4)
             .HandLocation = New Point(.HandLocationMid.X - ((Card.CardWidth + cardOffsetX * (.TotalCards - 1)) / 2), _
                                       .HandLocationMid.Y - (Card.CardHeight / 2))
         End With
     End Sub
 
     Private Sub UpdateHandLocations()
-        Player(CardOwners.Deck).HandLocation = New Point(((screenWidth / 2) - 10 - Card.CardWidth), ((screenHeight / 2) - (Card.CardHeight / 2)))
-        Player(CardOwners.Discard).HandLocation = New Point((screenWidth / 2) + 10, ((screenHeight / 2) - (Card.CardHeight / 2)))
-        Player(1).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) + 200)
-        Player(2).HandLocationMid = New Point((screenWidth / 2) - 200, (screenHeight / 2))
-        Player(3).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) - 200)
-        Player(4).HandLocationMid = New Point((screenWidth / 2) + 200, (screenHeight / 2))
+        player(CardOwners.Deck).HandLocation = New Point(((screenWidth / 2) - 10 - Card.CardWidth), ((screenHeight / 2) - (Card.CardHeight / 2)))
+        player(CardOwners.Discard).HandLocation = New Point((screenWidth / 2) + 10, ((screenHeight / 2) - (Card.CardHeight / 2)))
+        player(1).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) + 200)
+        player(2).HandLocationMid = New Point((screenWidth / 2) - 200, (screenHeight / 2))
+        player(3).HandLocationMid = New Point((screenWidth / 2), (screenHeight / 2) - 200)
+        player(4).HandLocationMid = New Point((screenWidth / 2) + 200, (screenHeight / 2))
     End Sub
 
-    Private Function HasBlitz(ByVal player As Byte) As Boolean
-        If PlayerScore(player) = 31 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Function PlayerScore(ByVal player As Byte) As Byte
-        Dim masterSuit As Byte = Me.Player(player).MasterSuit
-        Dim score As Byte
-        Dim i As Byte
-
-        With Me.Player(player)
-            For i = 0 To 2
-                If .Hand(i).Suit = masterSuit Then
-                    score += .Hand(i).Value
-                End If
-            Next
-        End With
-
-        Return score
-    End Function
-
     Private Sub ComputerTurn()
-        Dim masterSuit As Byte = Me.Player(currentPlayer).MasterSuit
+        Dim masterSuit As Byte = player(currentPlayer).MasterSuit
         Dim suits(3) As Byte
         Dim highestCard As Byte
         Dim lowestCard As Byte
@@ -854,7 +816,7 @@ Public Class frmGameTable
                     goal = 29
                 End If
 
-                If PlayerScore(currentPlayer) > goal Then
+                If player(currentPlayer).Score > goal Then
                     knocker = currentPlayer
                     knockActive = True
                 End If
@@ -862,7 +824,7 @@ Public Class frmGameTable
         End If
 
         If Not knockActive Or (knockActive And knocker <> currentPlayer) Then
-            With Me.Player(currentPlayer)
+            With player(currentPlayer)
                 For i = 0 To 2
                     suits(.Hand(i).Suit) += 1
                 Next
@@ -987,11 +949,11 @@ Public Class frmGameTable
                 End If
 
                 If cardToTake = noCard Then
-                    Player(CardOwners.Deck).Flagged = True
+                    player(CardOwners.Deck).Flagged = True
                     RefreshScreen()
                     Thread.Sleep(sleepTime * 500)
                     MoveCard(CardOwners.Deck, currentPlayer)
-                    Player(CardOwners.Deck).Flagged = False
+                    player(CardOwners.Deck).Flagged = False
                 Else
                     deck(cardToTake).Invert = True
                     RefreshScreen()
