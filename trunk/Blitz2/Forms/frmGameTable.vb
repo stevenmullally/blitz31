@@ -480,6 +480,38 @@ Public Class frmGameTable
 
     Private Sub RoundOver()
         roundActive = False
+
+        DetermineWinner()
+
+        Dim activePlayers As Byte = 0
+        For i As Byte = 1 To 4
+            With Me.Player(i)
+                If .Tokens >= 0 Then
+                    .InGame = True
+                    activePlayers += 1
+                Else
+                    .InGame = False
+                End If
+            End With
+        Next
+
+        If activePlayers = 1 Or Not Me.Player(1).InGame Then
+            GameOver()
+        End If
+
+        ' Show new round button
+
+        ' Set dealer for next round
+        Do
+            dealer += 1
+            If dealer > 4 Then dealer = 1
+        Loop Until Me.Player(dealer).InGame
+
+        ' Set currentPlayer to player clock-wise of dealer
+        Do
+            currentPlayer += 1
+            If currentPlayer > 4 Then currentPlayer = 1
+        Loop Until Me.Player(currentPlayer).InGame
     End Sub
 
     Private Sub TakeTurn()
@@ -527,6 +559,7 @@ Public Class frmGameTable
     Private Sub DoTurnOver()
         If knockActive And knocker = currentPlayer Then
             ' Show that the player knocked
+            Debug.WriteLine(Me.Player(currentPlayer).Name & " has knocked.")
         End If
 
         If HasBlitz(currentPlayer) And roundActive Then
@@ -550,6 +583,14 @@ Public Class frmGameTable
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub DetermineWinner()
+
+    End Sub
+
+    Private Sub GameOver()
+
     End Sub
 #End Region
 
@@ -835,7 +876,6 @@ Public Class frmGameTable
                 If PlayerScore(currentPlayer) > goal Then
                     knocker = currentPlayer
                     knockActive = True
-                    Debug.WriteLine("Player " & currentPlayer.ToString & " knocked.")
                 End If
             End If
         End If
