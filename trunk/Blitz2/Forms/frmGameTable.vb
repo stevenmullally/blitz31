@@ -82,8 +82,6 @@ Public Class frmGameTable
 #If DEBUG Then
         DEBUG_MODE = True
 #End If
-
-        LoadConfig(ConfigFile)
     End Sub
 
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -123,7 +121,8 @@ Public Class frmGameTable
     End Sub
 
     Private Sub GameTable_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDoubleClick
-        If Not gameActive Or Not roundActive Then Exit Sub
+        If Not gameActive Then Exit Sub
+        If Not roundActive Then SetupNewRound()
 
         ' Check if cards are being dealt.
         SyncLock dealingObj
@@ -265,9 +264,9 @@ Public Class frmGameTable
                     With Player(2)
                         If .InGame Then
                             If DEBUG_MODE Or Not roundActive Then
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
                             Else
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
                             End If
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
@@ -276,9 +275,9 @@ Public Class frmGameTable
                     With Player(3)
                         If .InGame Then
                             If DEBUG_MODE Or Not roundActive Then
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
                             Else
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
                             End If
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
@@ -287,9 +286,9 @@ Public Class frmGameTable
                     With Player(4)
                         If .InGame Then
                             If DEBUG_MODE Or Not roundActive Then
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
                             Else
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, False)
+                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
                             End If
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
@@ -441,6 +440,7 @@ Public Class frmGameTable
         ResetDeck()
 
         ' Deal the cards.
+        Debug.WriteLine("Dealer: " & dealer.ToString)
         dealCardsThread = New Thread(AddressOf DealCards)
         dealCardsThread.Start()
     End Sub
@@ -482,10 +482,10 @@ Public Class frmGameTable
         roundActive = False
 
         DetermineWinner()
-
+        Debug.WriteLine("Round over")
         Dim activePlayers As Byte = 0
         For i As Byte = 1 To 4
-            With Me.Player(i)
+            With Player(i)
                 If .Tokens >= 0 Then
                     .InGame = True
                     activePlayers += 1
@@ -495,7 +495,7 @@ Public Class frmGameTable
             End With
         Next
 
-        If activePlayers = 1 Or Not Me.Player(1).InGame Then
+        If activePlayers = 1 Or Not Player(1).InGame Then
             GameOver()
         End If
 
@@ -505,13 +505,14 @@ Public Class frmGameTable
         Do
             dealer += 1
             If dealer > 4 Then dealer = 1
-        Loop Until Me.Player(dealer).InGame
+        Loop Until Player(dealer).InGame
 
         ' Set currentPlayer to player clock-wise of dealer
+        currentPlayer = dealer
         Do
             currentPlayer += 1
             If currentPlayer > 4 Then currentPlayer = 1
-        Loop Until Me.Player(currentPlayer).InGame
+        Loop Until Player(currentPlayer).InGame
     End Sub
 
     Private Sub TakeTurn()
@@ -559,7 +560,7 @@ Public Class frmGameTable
     Private Sub DoTurnOver()
         If knockActive And knocker = currentPlayer Then
             ' Show that the player knocked
-            Debug.WriteLine(Me.Player(currentPlayer).Name & " has knocked.")
+            Debug.WriteLine(Player(currentPlayer).Name & " has knocked.")
         End If
 
         If HasBlitz(currentPlayer) And roundActive Then
@@ -1006,13 +1007,21 @@ Public Class frmGameTable
                 End If
 
                 If cardToTake = noCard Then
+                    Player(CardOwners.Deck).Flagged = True
+                    RefreshScreen()
+                    Thread.Sleep(sleepTime * 500)
                     MoveCard(CardOwners.Deck, currentPlayer)
+                    Player(CardOwners.Deck).Flagged = False
                 Else
+                    deck(cardToTake).Invert = True
+                    RefreshScreen()
+                    Thread.Sleep(sleepTime * 500)
                     MoveCard(CardOwners.Discard, currentPlayer, cardToTake)
+                    deck(cardToTake).Invert = False
                 End If
 
                 RefreshScreen()
-                Thread.Sleep(sleepTime * 1000)
+                Thread.Sleep(sleepTime * 500)
                 sumA = 0 : sumB = 0
 
                 For i = 0 To 3
@@ -1118,6 +1127,10 @@ Public Class frmGameTable
                         cardToRemove = .Hand(lowestCard).Position
                 End Select
 
+                deck(cardToRemove).Invert = True
+                RefreshScreen()
+                Thread.Sleep(sleepTime * 1000)
+                deck(cardToRemove).Invert = False
                 MoveCard(currentPlayer, CardOwners.Discard, cardToRemove)
             End With
         End If
