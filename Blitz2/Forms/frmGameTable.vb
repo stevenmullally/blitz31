@@ -22,6 +22,7 @@ Imports Blitz.Objects.Player
 
 Public Class frmGameTable
 #Region "Game Fields"
+    Public Const ConfigFile As String = "config.xml"
     Private deck(51) As Card
     Public Player(5) As Player
 
@@ -81,6 +82,8 @@ Public Class frmGameTable
 #If DEBUG Then
         DEBUG_MODE = True
 #End If
+
+        LoadConfig(ConfigFile)
     End Sub
 
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -1121,4 +1124,42 @@ Public Class frmGameTable
     End Sub
 #End Region
 
+#Region "Settings"
+    Private Sub LoadConfig(ByVal filename As String)
+        If Not IO.File.Exists(filename) Then
+            CreateConfigFile(filename)
+        Else
+
+        End If
+    End Sub
+
+    Private Sub CreateConfigFile(ByVal filename As String)
+        Dim writerSettings As Xml.XmlWriterSettings = New Xml.XmlWriterSettings()
+
+        writerSettings.Encoding = System.Text.Encoding.UTF8
+        writerSettings.Indent = True
+
+        Using writer As Xml.XmlWriter = Xml.XmlWriter.Create(filename, writerSettings)
+            With writer
+                .WriteStartDocument()
+                .WriteStartElement("Blitz") ' Root
+
+                .WriteStartElement("Settings")
+                .WriteElementString("Update_On_Start", "True")
+                .WriteEndElement()
+
+                .WriteStartElement("Player_Info")
+                For i As Byte = 1 To 4
+                    .WriteStartElement("Player_" & i.ToString)
+                    .WriteElementString("Name", "Player " & i.ToString)
+                    .WriteEndElement()
+                Next
+                .WriteEndElement()
+
+                .WriteEndElement()
+                .WriteEndDocument()
+            End With
+        End Using
+    End Sub
+#End Region
 End Class
