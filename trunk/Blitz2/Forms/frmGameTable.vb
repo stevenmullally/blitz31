@@ -61,8 +61,6 @@ Public Class frmGameTable
     Private dealCardsThread As Thread
     Private cardsDealt As DateTime = Nothing
 
-    Private DEBUG_MODE As Boolean
-
     Private Enum CardOwners
         Deck = 0
         Discard = 5
@@ -78,10 +76,6 @@ Public Class frmGameTable
         ' Add any initialization after the InitializeComponent() call.
         Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         Me.UpdateStyles()
-
-#If DEBUG Then
-        DEBUG_MODE = True
-#End If
     End Sub
 
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -260,35 +254,17 @@ Public Class frmGameTable
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
                     End With
-                Case 2
-                    With Player(2)
+                Case 2, 3, 4
+                    With Player(deck(i).Owner)
                         If .InGame Then
-                            If DEBUG_MODE Or Not roundActive Then
+                            If Not roundActive Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
                             Else
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
-                            End If
-                            .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
-                        End If
-                    End With
-                Case 3
-                    With Player(3)
-                        If .InGame Then
-                            If DEBUG_MODE Or Not roundActive Then
+#If DEBUG Then
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
-                            Else
+#Else
                                 PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
-                            End If
-                            .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
-                        End If
-                    End With
-                Case 4
-                    With Player(4)
-                        If .InGame Then
-                            If DEBUG_MODE Or Not roundActive Then
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), i, deck(i).Invert)
-                            Else
-                                PaintCard(e.Graphics, New Point(.HandLocation.X, .HandLocation.Y), noCard, deck(i).Invert)
+#End If
                             End If
                             .HandLocation = New Point(.HandLocation.X + cardOffsetX, .HandLocation.Y)
                         End If
@@ -479,10 +455,12 @@ Public Class frmGameTable
     End Sub
 
     Private Sub RoundOver()
-        roundActive = False
-
-        DetermineWinner()
         Debug.WriteLine("Round over")
+
+        roundActive = False
+        RefreshScreen()
+        DetermineWinner()
+
         Dim activePlayers As Byte = 0
         For i As Byte = 1 To 4
             With Player(i)
@@ -610,7 +588,9 @@ Public Class frmGameTable
             If Me.Player(player).InGame Then
                 MoveCard(CardOwners.Deck, player)
                 RefreshScreen()
-                If Not DEBUG_MODE Then Thread.Sleep(100)
+#If Not Debug Then
+                Thread.Sleep(100)
+#End If
             End If
 
             player += 1
