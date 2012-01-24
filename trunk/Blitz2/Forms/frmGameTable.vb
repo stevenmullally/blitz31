@@ -118,31 +118,44 @@ Public Class frmGameTable
         If Not gameActive Then Exit Sub
         If Not roundActive Then SetupNewRound()
 
+        Dim cardFound As Boolean = False
+
         ' Check if cards are being dealt.
         SyncLock dealingObj
             If dealingCards Then Exit Sub
         End SyncLock
 
-        Dim i As Byte
+        ' Check if computer taking turn.
+        SyncLock computerObj
+            If takingTurn Then Exit Sub
+        End SyncLock
 
         ' Find the inverted card and move it.
-        For i = 0 To UBound(deck)
+        For i As Byte = 0 To UBound(deck)
             If deck(i).Invert Then
                 Select Case deck(i).Owner
                     Case 1
                         If pickupCard = i Then
                             MsgBox("You cannot discard the card you just picked up from the discard pile.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Illegal Move")
                         Else
+                            cardFound = True
                             MoveCard(1, CardOwners.Discard, i)
                             RefreshScreen()
                             TurnOver()
                         End If
                     Case CardOwners.Deck, CardOwners.Discard
+                        cardFound = True
                         MoveCard(deck(i).Owner, 1, i)
                         RefreshScreen()
                 End Select
             End If
         Next
+
+        If Not cardFound And currentPlayer = 1 And player(currentPlayer).TotalCards = 3 Then
+            knockActive = True
+            knocker = 1
+            TurnOver()
+        End If
     End Sub
 
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
