@@ -30,6 +30,8 @@ Partial Class frmGameTable
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutBlitzToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.lblInfo = New System.Windows.Forms.Label()
+        Me.lblKnocker = New System.Windows.Forms.Label()
         Me.MainMenu.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -55,18 +57,18 @@ Partial Class frmGameTable
         '
         Me.NewGameToolStripMenuItem.Name = "NewGameToolStripMenuItem"
         Me.NewGameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.NewGameToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.NewGameToolStripMenuItem.Text = "New Game"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(148, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'HelpToolStripMenuItem
@@ -79,21 +81,45 @@ Partial Class frmGameTable
         'AboutBlitzToolStripMenuItem
         '
         Me.AboutBlitzToolStripMenuItem.Name = "AboutBlitzToolStripMenuItem"
-        Me.AboutBlitzToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.AboutBlitzToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.AboutBlitzToolStripMenuItem.Text = "&About Blitz"
         '
-        'GameTable
+        'lblInfo
+        '
+        Me.lblInfo.BackColor = System.Drawing.Color.Transparent
+        Me.lblInfo.Font = New System.Drawing.Font("Constantia", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblInfo.ForeColor = System.Drawing.Color.White
+        Me.lblInfo.Location = New System.Drawing.Point(12, 380)
+        Me.lblInfo.Name = "lblInfo"
+        Me.lblInfo.Size = New System.Drawing.Size(577, 26)
+        Me.lblInfo.TabIndex = 1
+        Me.lblInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblKnocker
+        '
+        Me.lblKnocker.BackColor = System.Drawing.Color.Transparent
+        Me.lblKnocker.Font = New System.Drawing.Font("Constantia", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblKnocker.ForeColor = System.Drawing.Color.White
+        Me.lblKnocker.Location = New System.Drawing.Point(12, 406)
+        Me.lblKnocker.Name = "lblKnocker"
+        Me.lblKnocker.Size = New System.Drawing.Size(577, 26)
+        Me.lblKnocker.TabIndex = 2
+        Me.lblKnocker.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'frmGameTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
         Me.ClientSize = New System.Drawing.Size(601, 601)
+        Me.Controls.Add(Me.lblKnocker)
+        Me.Controls.Add(Me.lblInfo)
         Me.Controls.Add(Me.MainMenu)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MainMenu
         Me.MaximizeBox = False
-        Me.Name = "GameTable"
+        Me.Name = "frmGameTable"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.MainMenu.ResumeLayout(False)
         Me.MainMenu.PerformLayout()
@@ -108,5 +134,7 @@ Partial Class frmGameTable
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AboutBlitzToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents lblInfo As System.Windows.Forms.Label
+    Friend WithEvents lblKnocker As System.Windows.Forms.Label
 
 End Class

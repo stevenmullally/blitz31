@@ -413,6 +413,8 @@ Public Class frmGameTable
         knockActive = False
         blitzActive = False
         knocker = Nothing
+        lblInfo.Text = Nothing
+        lblKnocker.Text = Nothing
 
         ' Reset player hands.
         For i = 0 To 4
@@ -430,6 +432,7 @@ Public Class frmGameTable
 
         ' Deal the cards.
         Debug.WriteLine("Dealer: " & dealer.ToString)
+        lblInfo.Text = player(dealer).Name & " is dealing the cards."
         dealCardsThread = New Thread(AddressOf DealCards)
         dealCardsThread.Start()
     End Sub
@@ -462,7 +465,7 @@ Public Class frmGameTable
 
     Private Sub RoundOver()
         Debug.WriteLine("Round over")
-
+        lblInfo.Text = "Round over"
         roundActive = False
         RefreshScreen()
         DetermineWinner()
@@ -510,6 +513,7 @@ Public Class frmGameTable
                     RoundOver()
                 Else
                     ' Show text under current player showing their turn.
+                    lblInfo.Text = player(currentPlayer).Name & "'s turn"
                     Select Case currentPlayer
                         Case 1
                             ' You're turn!
@@ -541,6 +545,7 @@ Public Class frmGameTable
         If knockActive And knocker = currentPlayer Then
             ' Show that the player knocked
             Debug.WriteLine(player(currentPlayer).Name & " has knocked.")
+            lblKnocker.Text = player(currentPlayer).Name & " has knocked."
         End If
 
         If player(currentPlayer).Score = 31 And roundActive Then
@@ -1170,4 +1175,8 @@ Public Class frmGameTable
         End Using
     End Sub
 #End Region
+
+    Private Sub lblInfo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblInfo.Click
+        Me.GameTable_MouseDoubleClick(sender, e)
+    End Sub
 End Class
