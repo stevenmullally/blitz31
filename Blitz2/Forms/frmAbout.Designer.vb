@@ -56,6 +56,7 @@ Partial Class frmAbout
         Me.txtLicense.Location = New System.Drawing.Point(12, 83)
         Me.txtLicense.Multiline = True
         Me.txtLicense.Name = "txtLicense"
+        Me.txtLicense.ReadOnly = True
         Me.txtLicense.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.txtLicense.Size = New System.Drawing.Size(562, 185)
         Me.txtLicense.TabIndex = 2
@@ -104,6 +105,7 @@ Partial Class frmAbout
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmAbout"
+        Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "About Blitz"
         Me.ResumeLayout(False)

@@ -30,7 +30,10 @@ Partial Class frmGameTable
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutBlitzToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.StatusStrip = New System.Windows.Forms.StatusStrip()
+        Me.lblGameNumber = New System.Windows.Forms.ToolStripStatusLabel()
         Me.MainMenu.SuspendLayout()
+        Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
         '
         'MainMenu
@@ -82,12 +85,33 @@ Partial Class frmGameTable
         Me.AboutBlitzToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.AboutBlitzToolStripMenuItem.Text = "&About Blitz"
         '
+        'StatusStrip
+        '
+        Me.StatusStrip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.StatusStrip.AutoSize = False
+        Me.StatusStrip.BackColor = System.Drawing.SystemColors.MenuBar
+        Me.StatusStrip.Dock = System.Windows.Forms.DockStyle.None
+        Me.StatusStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblGameNumber})
+        Me.StatusStrip.Location = New System.Drawing.Point(0, 601)
+        Me.StatusStrip.Name = "StatusStrip"
+        Me.StatusStrip.Size = New System.Drawing.Size(601, 22)
+        Me.StatusStrip.SizingGrip = False
+        Me.StatusStrip.TabIndex = 1
+        Me.StatusStrip.Text = "StatusStrip1"
+        '
+        'lblGameNumber
+        '
+        Me.lblGameNumber.Name = "lblGameNumber"
+        Me.lblGameNumber.Size = New System.Drawing.Size(78, 17)
+        Me.lblGameNumber.Text = "Game #00000"
+        '
         'frmGameTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.ClientSize = New System.Drawing.Size(601, 601)
+        Me.ClientSize = New System.Drawing.Size(601, 623)
+        Me.Controls.Add(Me.StatusStrip)
         Me.Controls.Add(Me.MainMenu)
         Me.DoubleBuffered = True
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
@@ -96,8 +120,11 @@ Partial Class frmGameTable
         Me.MaximizeBox = False
         Me.Name = "frmGameTable"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "Blitz"
         Me.MainMenu.ResumeLayout(False)
         Me.MainMenu.PerformLayout()
+        Me.StatusStrip.ResumeLayout(False)
+        Me.StatusStrip.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -109,5 +136,7 @@ Partial Class frmGameTable
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AboutBlitzToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents StatusStrip As System.Windows.Forms.StatusStrip
+    Friend WithEvents lblGameNumber As System.Windows.Forms.ToolStripStatusLabel
 
 End Class

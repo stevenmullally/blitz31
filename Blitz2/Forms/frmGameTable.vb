@@ -76,9 +76,9 @@ Public Class frmGameTable
         Catch ex As Exception
             MsgBox("Unable to initialize cards library.", vbOKOnly + vbCritical, "Card Library Error")
             Me.Close()
-            Exit Sub
         End Try
 
+        lblGameNumber.Text = Nothing
         CreatePlayers()
     End Sub
 
@@ -348,8 +348,6 @@ Public Class frmGameTable
             cardsDealt = DateTime.Now
         End If
 
-        Cursor.Current = Cursors.WaitCursor
-
         ' Abort any running threads.
         SyncLock computerObj
             If takingTurn Then
@@ -387,7 +385,6 @@ Public Class frmGameTable
         currentPlayer = 1
         UpdateHandLocations()
         gameActive = True
-        Cursor.Current = Cursors.Arrow
         SetupNewRound()
     End Sub
 
@@ -395,7 +392,6 @@ Public Class frmGameTable
         Dim rnd As New Random
         Dim i As Byte
 
-        Cursor.Current = Cursors.WaitCursor
         knockActive = False
         blitzActive = False
         knocker = Nothing
@@ -410,7 +406,7 @@ Public Class frmGameTable
 
         ' Get the seed for the current round.
         seed = rnd.Next(0, 65535)
-        Me.Text = seed.ToString
+        lblGameNumber.Text = "Game #" & seed.ToString
 
         ResetDeck()
 
@@ -1113,12 +1109,4 @@ Public Class frmGameTable
         frmAbout.Show()
     End Sub
 #End Region
-
-#Region "Settings"
-
-#End Region
-
-    Private Sub lblInfo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Me.GameTable_MouseDoubleClick(sender, e)
-    End Sub
 End Class

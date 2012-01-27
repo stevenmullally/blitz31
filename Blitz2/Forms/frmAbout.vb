@@ -22,6 +22,7 @@ Public Class frmAbout
         Dim versionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
 
         txtLicense.Text = Blitz.My.Resources.COPYING
+        txtLicense.SelectionStart = 0
         lblAppVersion.Text = "Version " & versionInfo.ProductVersion
     End Sub
 
@@ -35,5 +36,13 @@ Public Class frmAbout
 
     Private Sub lblWebSite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblWebSite.Click
         Process.Start(siteURL)
+    End Sub
+
+    Private Sub lblWebSite_MouseEnter(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblWebSite.MouseEnter
+        Me.Cursor = Cursors.Hand
+    End Sub
+
+    Private Sub lblWebSite_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblWebSite.MouseLeave
+        Me.Cursor = Cursors.Arrow
     End Sub
 End Class

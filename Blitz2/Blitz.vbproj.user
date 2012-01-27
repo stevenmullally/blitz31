@@ -2,11 +2,11 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PublishUrlHistory>\\WAMP-SERVER\www\ryanskeldon_com\software\blitz\update\|\\WAMP-SERVER\www\ryanskeldon_com\software\blitz\|\\WAMP-SERVER\www\ryanskeldon_com\blitz\|publish\</PublishUrlHistory>
-    <InstallUrlHistory>\\WAMP-SERVER\www\ryanskeldon_com\software\blitz\</InstallUrlHistory>
-    <SupportUrlHistory />
+    <InstallUrlHistory>\\ATOM\Public\Blitz 31\|\\WAMP-SERVER\www\ryanskeldon_com\software\blitz\</InstallUrlHistory>
+    <SupportUrlHistory>http://code.google.com/p/blitz31/issues/list</SupportUrlHistory>
     <UpdateUrlHistory>http://ryanskeldon.com/software/blitz/update/|http://ryanskeldon.com/software/blitz/|http://ryanskeldon.com/blitz/|http://ryanskeldon.com/Blitz2/</UpdateUrlHistory>
     <BootstrapperUrlHistory />
-    <ErrorReportUrlHistory />
+    <ErrorReportUrlHistory>http://code.google.com/p/blitz31/issues/list</ErrorReportUrlHistory>
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
