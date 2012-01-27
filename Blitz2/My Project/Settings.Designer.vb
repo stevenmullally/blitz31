@@ -53,6 +53,66 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property UpdateOnStart() As Boolean
+            Get
+                Return CType(Me("UpdateOnStart"),Boolean)
+            End Get
+            Set
+                Me("UpdateOnStart") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Player 1")>  _
+        Public Property Player1Name() As String
+            Get
+                Return CType(Me("Player1Name"),String)
+            End Get
+            Set
+                Me("Player1Name") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Player 2")>  _
+        Public Property Player2Name() As String
+            Get
+                Return CType(Me("Player2Name"),String)
+            End Get
+            Set
+                Me("Player2Name") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Player 3")>  _
+        Public Property Player3Name() As String
+            Get
+                Return CType(Me("Player3Name"),String)
+            End Get
+            Set
+                Me("Player3Name") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Player 4")>  _
+        Public Property Player4Name() As String
+            Get
+                Return CType(Me("Player4Name"),String)
+            End Get
+            Set
+                Me("Player4Name") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
