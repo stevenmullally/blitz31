@@ -14,7 +14,7 @@ Public Class frmMain
     End Sub
 
     Private Sub btnUpdate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnUpdate.Click
-        Dim updateListR As String = "http://www.psykad.com/software/blitz/updatelist.txt"
+        Dim updateListR As String = "http://www.ryanskeldon.com/software/blitz/updatelist.txt"
         Dim updateListL As String = Application.StartupPath & "\updatelist.txt"
 
         btnUpdate.Enabled = False
