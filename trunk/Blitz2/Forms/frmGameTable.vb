@@ -69,21 +69,12 @@ Public Class frmGameTable
 #End Region
 
 #Region "Form Methods"
-    Public Sub New()
-        ' This call is required by the Windows Form Designer.
-        InitializeComponent()
-
-        ' Add any initialization after the InitializeComponent() call.
-        Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
-        Me.UpdateStyles()
-    End Sub
-
     Private Sub GameTable_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         ' Initialize card library.
         Try
             If Not Card.Initialize Then Exit Sub
         Catch ex As Exception
-            MsgBox("Unable to initialize cards library.", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, "Card Library Error")
+            MsgBox("Unable to initialize cards library.", vbOKOnly + vbCritical, "Card Library Error")
             Me.Close()
             Exit Sub
         End Try
@@ -115,8 +106,7 @@ Public Class frmGameTable
     End Sub
 
     Private Sub GameTable_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDoubleClick
-        If Not gameActive Then Exit Sub
-        If Not roundActive Then SetupNewRound()
+        If Not gameActive Or Not roundActive Then Exit Sub
 
         Dim cardFound As Boolean = False
 
@@ -136,7 +126,7 @@ Public Class frmGameTable
                 Select Case deck(i).Owner
                     Case 1
                         If pickupCard = i Then
-                            MsgBox("You cannot discard the card you just picked up from the discard pile.", MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, "Illegal Move")
+                            MsgBox("You cannot discard the card you just picked up from the discard pile.", vbOKOnly + vbInformation, "Illegal Move")
                         Else
                             cardFound = True
                             MoveCard(1, CardOwners.Discard, i)
@@ -150,12 +140,6 @@ Public Class frmGameTable
                 End Select
             End If
         Next
-
-        If Not cardFound And currentPlayer = 1 And player(currentPlayer).TotalCards = 3 Then
-            knockActive = True
-            knocker = 1
-            TurnOver()
-        End If
     End Sub
 
     Private Sub GameTable_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseDown
@@ -371,6 +355,7 @@ Public Class frmGameTable
             If takingTurn Then
                 Try
                     computerThread.Abort()
+                    takingTurn = False
                 Catch ex As Exception
 
                 End Try
@@ -381,6 +366,7 @@ Public Class frmGameTable
             If dealingCards Then
                 Try
                     dealCardsThread.Abort()
+                    dealingCards = False
                 Catch ex As Exception
 
                 End Try
@@ -413,8 +399,6 @@ Public Class frmGameTable
         knockActive = False
         blitzActive = False
         knocker = Nothing
-        lblInfo.Text = Nothing
-        lblKnocker.Text = Nothing
 
         ' Reset player hands.
         For i = 0 To 4
@@ -431,8 +415,6 @@ Public Class frmGameTable
         ResetDeck()
 
         ' Deal the cards.
-        Debug.WriteLine("Dealer: " & dealer.ToString)
-        lblInfo.Text = player(dealer).Name & " is dealing the cards."
         dealCardsThread = New Thread(AddressOf DealCards)
         dealCardsThread.Start()
     End Sub
@@ -464,8 +446,6 @@ Public Class frmGameTable
     End Sub
 
     Private Sub RoundOver()
-        Debug.WriteLine("Round over")
-        lblInfo.Text = "Round over"
         roundActive = False
         RefreshScreen()
         DetermineWinner()
@@ -513,7 +493,6 @@ Public Class frmGameTable
                     RoundOver()
                 Else
                     ' Show text under current player showing their turn.
-                    lblInfo.Text = player(currentPlayer).Name & "'s turn"
                     Select Case currentPlayer
                         Case 1
                             ' You're turn!
@@ -544,8 +523,6 @@ Public Class frmGameTable
     Private Sub DoTurnOver()
         If knockActive And knocker = currentPlayer Then
             ' Show that the player knocked
-            Debug.WriteLine(player(currentPlayer).Name & " has knocked.")
-            lblKnocker.Text = player(currentPlayer).Name & " has knocked."
         End If
 
         If player(currentPlayer).Score = 31 And roundActive Then
@@ -734,14 +711,14 @@ Public Class frmGameTable
 
         player(1).Mode = Modes.Human
 
-        With Me
-            .player(1).Name = "Player 1"
-            .player(2).Name = "Player 2"
-            .player(3).Name = "Player 3"
-            .player(4).Name = "Player 4"
-
-            UpdateHandLocations()
+        With My.Settings
+            player(1).Name = .Player1Name
+            player(2).Name = .Player2Name
+            player(3).Name = .Player3Name
+            player(4).Name = .Player4Name
         End With
+
+        UpdateHandLocations()
     End Sub
 
     Private Function NextPlayer() As Byte
@@ -1138,45 +1115,10 @@ Public Class frmGameTable
 #End Region
 
 #Region "Settings"
-    Private Sub LoadConfig(ByVal filename As String)
-        If Not IO.File.Exists(filename) Then
-            CreateConfigFile(filename)
-        Else
 
-        End If
-    End Sub
-
-    Private Sub CreateConfigFile(ByVal filename As String)
-        Dim writerSettings As Xml.XmlWriterSettings = New Xml.XmlWriterSettings()
-
-        writerSettings.Encoding = System.Text.Encoding.UTF8
-        writerSettings.Indent = True
-
-        Using writer As Xml.XmlWriter = Xml.XmlWriter.Create(filename, writerSettings)
-            With writer
-                .WriteStartDocument()
-                .WriteStartElement("Blitz") ' Root
-
-                .WriteStartElement("Settings")
-                .WriteElementString("Update_On_Start", "True")
-                .WriteEndElement()
-
-                .WriteStartElement("Player_Info")
-                For i As Byte = 1 To 4
-                    .WriteStartElement("Player_" & i.ToString)
-                    .WriteElementString("Name", "Player " & i.ToString)
-                    .WriteEndElement()
-                Next
-                .WriteEndElement()
-
-                .WriteEndElement()
-                .WriteEndDocument()
-            End With
-        End Using
-    End Sub
 #End Region
 
-    Private Sub lblInfo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblInfo.Click
+    Private Sub lblInfo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.GameTable_MouseDoubleClick(sender, e)
     End Sub
 End Class
