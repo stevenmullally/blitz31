@@ -87,25 +87,5 @@ Namespace My.Resources
                 Return ResourceManager.GetString("COPYING", resourceCulture)
             End Get
         End Property
-        
-        '''<summary>
-        '''  Looks up a localized string similar to -= Blitz Readme =-
-        '''
-        '''    Blitz, a simple draw and discard game, suitable for players of all ages.
-        '''    Copyright (C) 2009-2010  Ryan Skeldon &lt;psykad@gmail.com&gt;
-        '''
-        '''    This program is free software; you can redistribute it and/or modify
-        '''    it under the terms of the GNU General Public License as published by
-        '''    the Free Software Foundation; either version 2 of the License, or
-        '''    (at your option) any later version.
-        '''
-        '''    This program is distributed in the hope that it will be useful,
-        '''    but WITHOUT A [rest of string was truncated]&quot;;.
-        '''</summary>
-        Friend ReadOnly Property README() As String
-            Get
-                Return ResourceManager.GetString("README", resourceCulture)
-            End Get
-        End Property
     End Module
 End Namespace
