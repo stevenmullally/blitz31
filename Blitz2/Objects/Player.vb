@@ -116,18 +116,18 @@ Namespace Objects
             End Set
         End Property
 
-        Private _tokens As Byte
+        Private _tokens As Integer
         ''' <summary>
         ''' Gets or sets the Player's token count.
         ''' </summary>
         ''' <value></value>
         ''' <returns>The Player's token count.</returns>
         ''' <remarks></remarks>
-        Public Property Tokens() As Byte
+        Public Property Tokens() As Integer
             Get
                 Return _tokens
             End Get
-            Set(ByVal value As Byte)
+            Set(ByVal value As Integer)
                 _tokens = value
             End Set
         End Property
