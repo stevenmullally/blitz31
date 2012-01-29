@@ -32,6 +32,7 @@ Partial Class frmGameTable
         Me.AboutBlitzToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
         Me.lblGameNumber = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.btnAction = New System.Windows.Forms.Button()
         Me.MainMenu.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -105,12 +106,22 @@ Partial Class frmGameTable
         Me.lblGameNumber.Size = New System.Drawing.Size(78, 17)
         Me.lblGameNumber.Text = "Game #00000"
         '
+        'btnAction
+        '
+        Me.btnAction.Location = New System.Drawing.Point(262, 401)
+        Me.btnAction.Name = "btnAction"
+        Me.btnAction.Size = New System.Drawing.Size(75, 23)
+        Me.btnAction.TabIndex = 2
+        Me.btnAction.Text = "Action"
+        Me.btnAction.UseVisualStyleBackColor = True
+        '
         'frmGameTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
         Me.ClientSize = New System.Drawing.Size(601, 623)
+        Me.Controls.Add(Me.btnAction)
         Me.Controls.Add(Me.StatusStrip)
         Me.Controls.Add(Me.MainMenu)
         Me.DoubleBuffered = True
@@ -138,5 +149,6 @@ Partial Class frmGameTable
     Friend WithEvents AboutBlitzToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents StatusStrip As System.Windows.Forms.StatusStrip
     Friend WithEvents lblGameNumber As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents btnAction As System.Windows.Forms.Button
 
 End Class

@@ -78,7 +78,6 @@ Public Class frmGameTable
             Me.Close()
         End Try
 
-        lblGameNumber.Text = Nothing
         CreatePlayers()
     End Sub
 
@@ -403,7 +402,7 @@ Public Class frmGameTable
         Next
 
         roundActive = True
-
+        
         ' Get the seed for the current round.
         seed = rnd.Next(0, 65535)
         lblGameNumber.Text = "Game #" & seed.ToString
@@ -488,6 +487,8 @@ Public Class frmGameTable
                 If knockActive And currentPlayer = knocker Then
                     RoundOver()
                 Else
+                    Debug.WriteLine(player(currentPlayer).Name & "'s turn")
+
                     ' Show text under current player showing their turn.
                     Select Case currentPlayer
                         Case 1
@@ -505,7 +506,6 @@ Public Class frmGameTable
                             End If
                         Case Modes.Computer
                             ' Disable UI.
-
                             computerThread = New Thread(AddressOf ComputerTurn)
                             computerThread.Start()
                     End Select
@@ -545,11 +545,64 @@ Public Class frmGameTable
     End Sub
 
     Private Sub DetermineWinner()
+        Dim lowestScore As Byte = 32
+        Dim totalLosers As Byte = 0
+        Dim tie As Boolean = False
 
+        If knockActive And Not blitzActive Then
+            ' Find who had the lowest score
+            For i As Byte = 1 To 4
+                player(i).Flagged = False
+                If player(i).InGame And player(i).Score < lowestScore Then lowestScore = player(i).Score
+            Next
+
+            For i As Byte = 1 To 4
+                If Not player(i).InGame Then Continue For
+
+                If player(i).Score = lowestScore Then
+                    player(i).Flagged = True
+                    totalLosers += 1
+                End If
+            Next
+
+            If totalLosers > 1 Then tie = True
+        Else
+            ' Find who had Blitz and set everyone to lose a point
+            For i As Byte = 1 To 4
+                If Not player(i).InGame Then Continue For
+
+                If player(i).Score = 31 Then
+                    player(i).Flagged = False
+                Else
+                    player(i).Flagged = True
+                End If
+            Next
+        End If
+
+        If blitzActive Then
+            Debug.WriteLine("Blitz!")
+        Else
+            Debug.WriteLine("Round over")
+        End If
+
+        ' Remove a token for anyone who lost
+        For i As Byte = 1 To 4
+            If Not player(i).InGame Then Continue For
+
+            If player(i).Flagged And knocker = i And tie Then player(i).Flagged = False
+
+            If player(i).Flagged Then
+                player(i).Tokens -= 1
+                Debug.WriteLine(player(i).Name & " lost")
+            End If
+
+            If player(i).Flagged And i = knocker And Not blitzActive Then player(i).Tokens -= 1
+            Debug.WriteLine(player(i).Name & " score: " & player(i).Score.ToString & "  Tokens: " & player(i).Tokens.ToString)
+        Next
     End Sub
 
     Private Sub GameOver()
-
+        Debug.WriteLine("Game over")
     End Sub
 #End Region
 
@@ -808,6 +861,7 @@ Public Class frmGameTable
                 End If
 
                 If player(currentPlayer).Score > goal Then
+                    Debug.WriteLine(player(currentPlayer).Name & " knocked")
                     knocker = currentPlayer
                     knockActive = True
                 End If
@@ -1109,4 +1163,15 @@ Public Class frmGameTable
         frmAbout.Show()
     End Sub
 #End Region
+
+    Private Sub btnAction_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAction.Click
+        If roundActive Then
+            Debug.WriteLine("Player 1 knocked")
+            knockActive = True
+            knocker = 1
+            TurnOver()
+        Else
+            SetupNewRound()
+        End If
+    End Sub
 End Class
