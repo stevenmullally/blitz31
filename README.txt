@@ -1,7 +1,7 @@
 -= Blitz Readme =-
 
     Blitz, a simple draw and discard game, suitable for players of all ages.
-    Copyright (C) 2009-2010  Ryan Skeldon <psykad@gmail.com>
+    Copyright (C) 2009-2012  Ryan Skeldon <psykad@gmail.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 -= Installation Requirements =-
 
-   * Operating System: Windows XP/2000/Vista/7 (32/64-bit compatible)
+   * Operating System: Windows XP/2000/Vista/7/8 (32/64-bit compatible)
    * Other: Microsoft .NET Framework 3.5 or Higher
 
 

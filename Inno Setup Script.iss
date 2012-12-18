@@ -35,7 +35,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: ".\Blitz2\bin\Release\Blitz.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\Blitz\bin\Release\Blitz.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\BlitzCards.dll"; DestDir: "{app}"; Flags: ignoreversion
